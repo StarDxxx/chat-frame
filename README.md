@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI 对话卡片
 
-## Getting Started
+将 AI 对话截取为可分享的情绪卡片。
 
-First, run the development server:
+支持从 DeepSeek 分享链接导入，或粘贴 `.txt` 文件（`AI:` / `人类:` 格式）。导入后可选取片段、编辑文字、模糊敏感内容，最终导出为图片。
+
+## 功能
+
+- **多平台导入** — DeepSeek 分享链接直接解析；ChatGPT / Claude 链接待接入
+- **片段编辑** — 富文本编辑，支持加粗、斜体、下划线、模糊打码
+- **卡片样式** — 石墨 / 天蓝 / 碧蓝三种色系，方格 / 小红书 / 抖音等尺寸
+- **高清导出** — 按目标分辨率计算像素比，自动分页
+
+## 运行
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 技术栈
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16 · React 19 · Tiptap · Tailwind CSS 4 · motion

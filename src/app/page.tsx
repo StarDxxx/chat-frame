@@ -1,65 +1,139 @@
-import Image from "next/image";
+"use client"
+
+import { useState } from "react"
+import { ConversationEditor } from "@/components/editor/ConversationEditor"
+import { PreviewPanel } from "@/components/preview/PreviewPanel"
+import { SelectModal } from "@/components/dashboard/SelectModal"
+import { ImportBar } from "@/components/import/ImportBar"
+import { PLACEHOLDER_CONVERSATION, PLACEHOLDER_SELECTED_IDS } from "@/lib/placeholder"
+import { getCardSize } from "@/lib/card-sizes"
+import type { CardSettings, CardSizeId, Conversation, ConversationTurn, EmotionThemeId, ThemeCategoryId } from "@/lib/types"
+
+interface PageState {
+  isDemo: boolean
+  conversation: Conversation
+  selectedTurnIds: string[]
+  selectedTurns: ConversationTurn[]
+  editedTurns: ConversationTurn[]
+  themeCategory: ThemeCategoryId
+  selectedTheme: EmotionThemeId
+  settings: CardSettings
+  selectModalOpen: boolean
+}
+
+const initialSelectedTurns = PLACEHOLDER_CONVERSATION.turns.filter((t) =>
+  PLACEHOLDER_SELECTED_IDS.includes(t.id)
+)
+
+const INITIAL: PageState = {
+  isDemo: true,
+  conversation: PLACEHOLDER_CONVERSATION,
+  selectedTurnIds: PLACEHOLDER_SELECTED_IDS,
+  selectedTurns: initialSelectedTurns,
+  editedTurns: initialSelectedTurns,
+  themeCategory: "card",
+  selectedTheme: "graphite",
+  settings: { showAvatars: true, showFooter: true, sizeId: "xiaohongshu", layoutFlow: "bottom-up", fontSize: 12, avatarUser: "我", avatarAI: "" },
+  selectModalOpen: false,
+}
 
 export default function Home() {
+  const [state, setState] = useState<PageState>(INITIAL)
+
+  const update = (patch: Partial<PageState>) =>
+    setState((prev) => ({ ...prev, ...patch }))
+
+  const handleImport = (conversation: Conversation) => {
+    const selectedIds = conversation.turns.map((t) => t.id)
+    const selected = conversation.turns
+    update({
+      isDemo: false,
+      conversation,
+      selectedTurnIds: selectedIds,
+      selectedTurns: selected,
+      editedTurns: selected,
+      // open select modal for URL imports so user can pick clips
+      selectModalOpen: conversation.source === "url",
+    })
+  }
+
+  const handleSelectConfirm = (ids: string[]) => {
+    const selected = state.conversation.turns.filter((t) => ids.includes(t.id))
+    update({
+      selectedTurnIds: ids,
+      selectedTurns: selected,
+      editedTurns: selected,
+      selectModalOpen: false,
+    })
+  }
+
+  const handleExport = async () => {
+    const { toPng } = await import("html-to-image")
+    const el = document.getElementById("card-export")
+    if (!el) return
+    const size = getCardSize(state.settings.sizeId)
+    const pixelRatio = size.exportWidth / el.offsetWidth
+    const dataUrl = await toPng(el, { pixelRatio })
+    const link = document.createElement("a")
+    link.download = "ai-emo-card.png"
+    link.href = dataUrl
+    link.click()
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <div className="flex flex-col h-screen bg-background">
+      {/* Header */}
+      <header className="shrink-0 h-13 border-b flex items-center px-5">
+        <span className="font-bold text-sm tracking-tight">✦ AI 对话卡片</span>
+      </header>
+
+      {/* Main */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left: import bar + editable conversation */}
+        <div className="flex-[6] min-w-0 flex flex-col border-r overflow-hidden">
+          <ImportBar
+            isDemo={state.isDemo}
+            conversation={state.conversation}
+            onImport={handleImport}
+            onSelectClips={() => update({ selectModalOpen: true })}
+          />
+          <div className="flex-1 overflow-y-auto">
+            <ConversationEditor
+              initialTurns={state.selectedTurns}
+              isDemo={state.isDemo}
+              avatarUser={state.settings.avatarUser}
+              avatarAI={state.settings.avatarAI}
+              onChange={(turns) => update({ editedTurns: turns })}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
         </div>
-      </main>
+
+        {/* Right: card preview + controls */}
+        <div className="flex-[4] min-w-0 flex flex-col">
+          <PreviewPanel
+            turns={state.editedTurns}
+            themeCategory={state.themeCategory}
+            themeId={state.selectedTheme}
+            platform={state.conversation.platform}
+            settings={state.settings}
+            onThemeCategoryChange={(id: ThemeCategoryId) => update({ themeCategory: id })}
+            onThemeChange={(id: EmotionThemeId) => update({ selectedTheme: id })}
+            onSizeChange={(id: CardSizeId) => update({ settings: { ...state.settings, sizeId: id } })}
+            onSettingsChange={(patch) => update({ settings: { ...state.settings, ...patch } })}
+            onExport={handleExport}
+          />
+        </div>
+      </div>
+
+      {/* Select modal */}
+      {state.selectModalOpen && (
+        <SelectModal
+          conversation={state.conversation}
+          selectedIds={state.selectedTurnIds}
+          onSelect={handleSelectConfirm}
+          onClose={() => update({ selectModalOpen: false })}
+        />
+      )}
     </div>
-  );
+  )
 }
