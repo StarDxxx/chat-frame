@@ -2,14 +2,31 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { CardPreview } from "@/components/card/CardPreview"
+import { MemoPreview } from "@/components/memo/MemoPreview"
+import { WeChatPreview } from "@/components/chat/WeChatPreview"
+import { WhatsAppPreview } from "@/components/chat/WhatsAppPreview"
+import { ClassicPreview } from "@/components/classic/ClassicPreview"
+import type { ClassicVariant } from "@/components/classic/ClassicPreview"
 import { THEMES } from "@/lib/themes"
 import { CARD_SIZES, getCardSize } from "@/lib/card-sizes"
 import type { CardSettings, CardSizeId, ConversationTurn, EmotionThemeId, PlatformId, ThemeCategoryId } from "@/lib/types"
 
+type ChatVariant = "wechat" | "whatsapp" | "imessage"
+const CHAT_VARIANTS: { id: ChatVariant; label: string }[] = [
+  { id: "wechat",    label: "微信" },
+  { id: "whatsapp",  label: "WhatsApp" },
+  { id: "imessage",  label: "iMessage" },
+]
+
+const CLASSIC_VARIANTS: { id: ClassicVariant; label: string }[] = [
+  { id: "claude",   label: "Claude" },
+  { id: "chatgpt",  label: "ChatGPT" },
+  { id: "deepseek", label: "DeepSeek" },
+]
+
 const THEME_CATEGORIES: { id: ThemeCategoryId; label: string; icon: string }[] = [
   { id: "chat-app", label: "聊天 APP", icon: "💬" },
   { id: "card",     label: "卡片",     icon: "🎴" },
-  { id: "memo",     label: "备忘录",   icon: "📋" },
   { id: "classic",  label: "经典原生", icon: "🖥" },
 ]
 
@@ -48,6 +65,8 @@ function isHtml(content: string) {
 
 export function PreviewPanel({ turns, themeCategory, themeId, platform, settings, onThemeCategoryChange, onThemeChange, onSizeChange, onSettingsChange, onExport }: Props) {
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [chatVariant, setChatVariant] = useState<ChatVariant>("wechat")
+  const [classicVariant, setClassicVariant] = useState<ClassicVariant>("claude")
   const [currentPage, setCurrentPage] = useState(0)
   // pageOffsets[N] = translateY start of page N (px from content top)
   const [pageOffsets, setPageOffsets] = useState<number[]>([0])
@@ -58,6 +77,7 @@ export function PreviewPanel({ turns, themeCategory, themeId, platform, settings
   const rulerRef = useRef<HTMLDivElement>(null)
 
   const size = getCardSize(settings.sizeId)
+  const aspectRatio = themeCategory === "chat-app" ? "9/19" : size.ratio
 
   // Track card element dimensions so the hidden ruler matches
   useEffect(() => {
@@ -147,7 +167,7 @@ export function PreviewPanel({ turns, themeCategory, themeId, platform, settings
     <div className="flex flex-col h-full">
       {/* Card area */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 gap-3 overflow-hidden min-h-0">
-        {themeCategory !== "card" ? (
+        {themeCategory !== "card" && themeCategory !== "chat-app" && themeCategory !== "classic" ? (
           <div className="flex flex-col items-center justify-center gap-3 text-center select-none">
             <div className="text-4xl opacity-20">
               {THEME_CATEGORIES.find((c) => c.id === themeCategory)?.icon}
@@ -162,20 +182,30 @@ export function PreviewPanel({ turns, themeCategory, themeId, platform, settings
         <div
           ref={cardWrapperRef}
           className="max-h-full max-w-full"
-          style={{ aspectRatio: size.ratio }}
+          style={{ aspectRatio }}
         >
-          <CardPreview
-            turns={turns}
-            themeId={themeId}
-            platform={platform}
-            settings={settings}
-            pageOffset={pageOffset}
-            pageViewportHeight={pageViewportH}
-          />
+          {themeCategory === "chat-app" ? (
+            chatVariant === "wechat"
+              ? <WeChatPreview   turns={turns} platform={platform} settings={settings} />
+              : chatVariant === "whatsapp"
+              ? <WhatsAppPreview turns={turns} platform={platform} settings={settings} />
+              : <MemoPreview     turns={turns} platform={platform} settings={settings} />
+          ) : themeCategory === "classic" ? (
+            <ClassicPreview variant={classicVariant} turns={turns} platform={platform} settings={settings} />
+          ) : (
+            <CardPreview
+              turns={turns}
+              themeId={themeId}
+              platform={platform}
+              settings={settings}
+              pageOffset={pageOffset}
+              pageViewportHeight={pageViewportH}
+            />
+          )}
         </div>
 
-        {/* Page indicator */}
-        {pageOffsets.length > 1 && (
+        {/* Page indicator — card only */}
+        {themeCategory === "card" && pageOffsets.length > 1 && (
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
@@ -233,31 +263,7 @@ export function PreviewPanel({ turns, themeCategory, themeId, platform, settings
 
       {/* Bottom controls */}
       <div className="shrink-0 border-t bg-background/80 backdrop-blur-sm px-4 py-3 space-y-2">
-        {/* Size chips — only for card */}
-        {themeCategory === "card" && <div className="flex gap-1.5 overflow-x-auto pb-0.5">
-          {CARD_SIZES.map((s) => (
-            <div key={s.id} className="relative group/sz shrink-0">
-              <button
-                onClick={() => onSizeChange(s.id)}
-                className={`rounded-full px-3 py-1 text-xs font-medium border transition-all
-                  ${settings.sizeId === s.id
-                    ? "bg-foreground text-background border-foreground scale-105"
-                    : "text-muted-foreground border-border hover:border-foreground/40 hover:text-foreground"
-                  }`}
-              >
-                {s.label}
-              </button>
-              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/sz:block z-50">
-                <div className="bg-gray-900 text-white text-[10px] rounded-md px-2 py-1 shadow-lg whitespace-nowrap">
-                  {s.exportWidth} × {s.exportHeight}
-                </div>
-                <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900 mx-auto" />
-              </div>
-            </div>
-          ))}
-        </div>}
-
-        {/* Theme category tabs */}
+        {/* Row 1: Theme category tabs — always visible */}
         <div className="flex gap-1.5 overflow-x-auto pb-0.5">
           {THEME_CATEGORIES.map((cat) => (
             <button
@@ -274,7 +280,24 @@ export function PreviewPanel({ turns, themeCategory, themeId, platform, settings
           ))}
         </div>
 
-        {/* Card color sub-row — only for "card" category */}
+        {/* Row 2: Sub-options — chat variants or card colors */}
+        {themeCategory === "chat-app" && (
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+            {CHAT_VARIANTS.map((v) => (
+              <button
+                key={v.id}
+                onClick={() => setChatVariant(v.id)}
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium border transition-all
+                  ${chatVariant === v.id
+                    ? "bg-foreground text-background border-foreground scale-105"
+                    : "text-muted-foreground border-border hover:border-foreground/40 hover:text-foreground"
+                  }`}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+        )}
         {themeCategory === "card" && (
           <div className="flex gap-2 overflow-x-auto pb-0.5">
             {THEMES.map((theme) => (
@@ -290,6 +313,51 @@ export function PreviewPanel({ turns, themeCategory, themeId, platform, settings
                 <span className={`w-4 h-4 rounded-full bg-gradient-to-br ${theme.gradient} shrink-0`} />
                 {theme.label}
               </button>
+            ))}
+          </div>
+        )}
+
+        {/* Classic variant sub-row */}
+        {themeCategory === "classic" && (
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+            {CLASSIC_VARIANTS.map((v) => (
+              <button
+                key={v.id}
+                onClick={() => setClassicVariant(v.id)}
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium border transition-all
+                  ${classicVariant === v.id
+                    ? "bg-foreground text-background border-foreground scale-105"
+                    : "text-muted-foreground border-border hover:border-foreground/40 hover:text-foreground"
+                  }`}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Row 3: Size chips — only for card */}
+        {themeCategory === "card" && (
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+            {CARD_SIZES.map((s) => (
+              <div key={s.id} className="relative group/sz shrink-0">
+                <button
+                  onClick={() => onSizeChange(s.id)}
+                  className={`rounded-full px-3 py-1 text-xs font-medium border transition-all
+                    ${settings.sizeId === s.id
+                      ? "bg-foreground text-background border-foreground scale-105"
+                      : "text-muted-foreground border-border hover:border-foreground/40 hover:text-foreground"
+                    }`}
+                >
+                  {s.label}
+                </button>
+                <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/sz:block z-50">
+                  <div className="bg-gray-900 text-white text-[10px] rounded-md px-2 py-1 shadow-lg whitespace-nowrap">
+                    {s.exportWidth} × {s.exportHeight}
+                  </div>
+                  <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900 mx-auto" />
+                </div>
+              </div>
             ))}
           </div>
         )}
