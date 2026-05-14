@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
+    "@tiptap/core": "3.23.4",
     "@tiptap/extension-bubble-menu": "^3.23.1",
     "@tiptap/extension-underline": "^3.23.1",
     "@tiptap/pm": "^3.23.1",
