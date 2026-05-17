@@ -84,7 +84,7 @@ export function PreviewPanel({
   onExport,
 }: Props) {
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [chatVariant, setChatVariant] = useState<ChatVariant>("wechat")
+  const [chatVariant, setChatVariant] = useState<ChatVariant>("imessage")
   const [classicVariant, setClassicVariant] = useState<ClassicVariant>("claude")
   const [currentPage, setCurrentPage] = useState(0)
   const [pageOffsets, setPageOffsets] = useState<number[]>([0])
