@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "motion/react"
+import { AnimatePresence, motion } from "motion/react"
 import { marked } from "marked"
 import { TurnEditor } from "./TurnEditor"
 import type { ConversationTurn } from "@/lib/types"
@@ -25,14 +25,10 @@ async function mdToHtml(md: string): Promise<string> {
 
 export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI, onChange }: Props) {
   const [editables, setEditables] = useState<EditableTurn[]>([])
-  const initKeyRef = useRef("")
 
   const turnsKey = initialTurns.map((t) => t.id).join(",")
 
   useEffect(() => {
-    if (turnsKey === initKeyRef.current) return
-    initKeyRef.current = turnsKey
-
     let cancelled = false
     Promise.all(
       initialTurns.map(async (turn) => ({
@@ -47,7 +43,10 @@ export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI,
 
   const isFirstRender = useRef(true)
   useEffect(() => {
-    if (isFirstRender.current) { isFirstRender.current = false; return }
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
     onChange(editables.map((e) => ({ ...e.turn, content: e.html })))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editables])
@@ -62,10 +61,13 @@ export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI,
 
   if (editables.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center p-12">
-        <p className="text-muted-foreground text-sm text-center">
-          导入对话后，内容将显示在这里
-        </p>
+      <div className="flex min-h-full items-center justify-center p-12">
+        <div className="max-w-xs border-2 border-foreground bg-[var(--paper-soft)] p-5 text-center ink-shadow">
+          <p className="font-editorial text-xl font-black">No copy on the desk.</p>
+          <p className="mt-2 text-xs font-semibold text-muted-foreground">
+            Import a conversation and the editable transcript will appear here.
+          </p>
+        </div>
       </div>
     )
   }
@@ -73,9 +75,9 @@ export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI,
   return (
     <div className="flex flex-col gap-4 p-6">
       {isDemo && (
-        <p className="text-[10px] text-muted-foreground/35 text-center select-none">
-          — 示例内容，导入你的对话以替换 —
-        </p>
+        <div className="mx-auto border border-foreground bg-[var(--accent)] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
+          sample copy / import your own to replace it
+        </div>
       )}
       <AnimatePresence initial={false}>
         {editables.map(({ turn, html }, i) => (
@@ -84,7 +86,7 @@ export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI,
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97 }}
-            transition={{ duration: 0.22, delay: i * 0.055, ease: "easeOut" }}
+            transition={{ duration: 0.22, delay: i * 0.04, ease: "easeOut" }}
           >
             <TurnEditor
               turn={turn}

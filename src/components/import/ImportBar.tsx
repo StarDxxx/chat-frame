@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
-import { motion, AnimatePresence } from "motion/react"
+import { useCallback, useRef, useState } from "react"
+import { AnimatePresence, motion } from "motion/react"
+import { FileText, Link2, Loader2, RotateCcw, Scissors, Upload } from "lucide-react"
 import type { Conversation } from "@/lib/types"
 import { parseText } from "@/lib/parser"
 
@@ -16,7 +17,7 @@ const PLATFORM_LABEL: Record<string, string> = {
   deepseek: "DeepSeek",
   chatgpt: "ChatGPT",
   claude: "Claude",
-  text: "文本导入",
+  text: "Text import",
 }
 
 export function ImportBar({ isDemo, conversation, onImport, onSelectClips }: Props) {
@@ -26,10 +27,6 @@ export function ImportBar({ isDemo, conversation, onImport, onSelectClips }: Pro
   const [error, setError] = useState("")
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (!isDemo) setExpanded(false)
-  }, [isDemo])
 
   const handleParse = async () => {
     const trimmed = urlInput.trim()
@@ -43,13 +40,20 @@ export function ImportBar({ isDemo, conversation, onImport, onSelectClips }: Pro
         body: JSON.stringify({ input: trimmed }),
       })
       const json = await res.json()
-      if (!res.ok) { setError(json.error ?? "解析失败"); return }
+      if (!res.ok) {
+        setError(json.error ?? "Parse failed")
+        return
+      }
       const conv: Conversation = json.conversation
-      if (!conv.turns.length) { setError("未识别到对话内容"); return }
+      if (!conv.turns.length) {
+        setError("No dialogue turns were found.")
+        return
+      }
       onImport(conv)
+      setExpanded(false)
       setUrlInput("")
     } catch {
-      setError("网络错误，请重试")
+      setError("Network error. Try again.")
     } finally {
       setLoading(false)
     }
@@ -57,7 +61,7 @@ export function ImportBar({ isDemo, conversation, onImport, onSelectClips }: Pro
 
   const handleFile = useCallback((file: File) => {
     if (!file.name.endsWith(".txt")) {
-      setError("仅支持 .txt 文件")
+      setError("Only .txt files are supported.")
       return
     }
     setError("")
@@ -66,10 +70,11 @@ export function ImportBar({ isDemo, conversation, onImport, onSelectClips }: Pro
       const text = e.target?.result as string
       const conv = parseText(text)
       if (!conv.turns.length) {
-        setError("未识别到对话内容，请检查格式")
+        setError("No dialogue turns were found. Check the text format.")
         return
       }
       onImport(conv)
+      setExpanded(false)
     }
     reader.readAsText(file)
   }, [onImport])
@@ -85,7 +90,7 @@ export function ImportBar({ isDemo, conversation, onImport, onSelectClips }: Pro
   const turnCount = conversation.turns.length
 
   return (
-    <div className="border-b bg-background shrink-0">
+    <div className="shrink-0 border-b-2 border-foreground bg-[var(--paper-soft)]">
       <AnimatePresence mode="wait" initial={false}>
         {expanded ? (
           <motion.div
@@ -94,90 +99,94 @@ export function ImportBar({ isDemo, conversation, onImport, onSelectClips }: Pro
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className="p-4 space-y-3"
+            className="space-y-3 p-4"
           >
-            {/* Title row */}
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-foreground/60 tracking-wide">导入你的 AI 对话</p>
-              <div className="flex items-center gap-2">
-                {isDemo && (
-                  <span className="text-[10px] text-muted-foreground/50 border border-border/50 rounded-full px-2 py-0.5">
-                    示例
-                  </span>
-                )}
-                {!isDemo && (
-                  <button
-                    onClick={() => setExpanded(false)}
-                    className="text-[11px] text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-                  >
-                    收起
-                  </button>
-                )}
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-editorial text-xl font-black leading-none">Import a conversation</p>
+                <p className="mt-1 text-[11px] font-semibold text-muted-foreground">
+                  Paste a share link, or drop a prepared transcript.
+                </p>
               </div>
-            </div>
-
-            {/* URL import */}
-            <div className="space-y-1.5">
-              <p className="text-[11px] text-muted-foreground/70 flex items-center gap-1.5">
-                <span>🔗</span>粘贴分享链接
-              </p>
-              <div className="flex gap-2">
-                <input
-                  className="flex-1 h-8 rounded-lg border bg-muted/40 px-3 text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="DeepSeek · ChatGPT · Claude 分享链接..."
-                  value={urlInput}
-                  onChange={(e) => { setUrlInput(e.target.value); setError("") }}
-                  onKeyDown={(e) => e.key === "Enter" && handleParse()}
-                />
+              {isDemo ? (
+                <span className="border border-foreground bg-[var(--accent)] px-2 py-0.5 text-[10px] font-black uppercase">
+                  sample
+                </span>
+              ) : (
                 <button
-                  onClick={handleParse}
-                  disabled={loading || !urlInput.trim()}
-                  className="shrink-0 h-8 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors"
+                  onClick={() => setExpanded(false)}
+                  className="border border-foreground px-2 py-1 text-[11px] font-bold uppercase hover:bg-foreground hover:text-background"
                 >
-                  {loading ? "…" : "解析"}
+                  Collapse
                 </button>
-              </div>
+              )}
             </div>
 
-            {/* File import */}
-            <div className="space-y-1.5">
-              <p className="text-[11px] text-muted-foreground/70 flex items-center gap-1.5">
-                <span>📄</span>导入 .txt 文件
-              </p>
-              <motion.div
-                animate={{
-                  backgroundColor: isDragOver ? "hsl(var(--primary) / 0.06)" : "hsl(var(--muted) / 0.3)",
-                  borderColor: isDragOver ? "hsl(var(--primary) / 0.5)" : "hsl(var(--border))",
-                }}
-                transition={{ duration: 0.12 }}
-                className="rounded-lg border-2 border-dashed p-3.5 text-center cursor-pointer hover:bg-muted/50 transition-colors"
+            <div className="grid gap-3 lg:grid-cols-[1.3fr_1fr]">
+              <div className="border-2 border-foreground bg-background p-3">
+                <label className="mb-2 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em]">
+                  <Link2 className="h-3.5 w-3.5" />
+                  Share link
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    className="h-9 min-w-0 flex-1 border-2 border-foreground bg-[var(--paper-soft)] px-3 text-xs font-semibold placeholder:text-muted-foreground/55 focus:outline-none focus:ring-2 focus:ring-[var(--proof)]"
+                    placeholder="DeepSeek / ChatGPT / Claude share URL"
+                    value={urlInput}
+                    onChange={(e) => { setUrlInput(e.target.value); setError("") }}
+                    onKeyDown={(e) => e.key === "Enter" && handleParse()}
+                  />
+                  <button
+                    onClick={handleParse}
+                    disabled={loading || !urlInput.trim()}
+                    className="grid h-9 w-10 place-items-center border-2 border-foreground bg-foreground text-background transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:proof-shadow disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Parse share link"
+                    title="Parse"
+                  >
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div
+                className={`border-2 border-dashed p-3 transition-colors ${
+                  isDragOver
+                    ? "border-[var(--proof)] bg-[var(--accent)]"
+                    : "border-foreground bg-background"
+                }`}
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => { e.preventDefault(); setIsDragOver(true) }}
                 onDragLeave={() => setIsDragOver(false)}
                 onDrop={handleDrop}
               >
-                <p className="text-xs text-muted-foreground">
-                  拖拽 .txt 文件至此，或<span className="text-primary font-medium"> 点击选择</span>
+                <div className="mb-2 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.16em]">
+                  <FileText className="h-3.5 w-3.5" />
+                  Transcript file
+                </div>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Drop a .txt file here, or click to choose one.
                 </p>
-                <p className="text-[10px] text-muted-foreground/40 mt-0.5">
-                  格式：AI: / 人类: 开头，支持连续多条
+                <p className="mt-1 text-[10px] text-muted-foreground/70">
+                  Supports AI: / Human: turns and alternating blocks.
                 </p>
-              </motion.div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".txt"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0]
-                  if (f) handleFile(f)
-                  e.target.value = ""
-                }}
-              />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".txt"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0]
+                    if (f) handleFile(f)
+                    e.target.value = ""
+                  }}
+                />
+              </div>
             </div>
 
             {error && (
-              <p className="text-[11px] text-destructive">{error}</p>
+              <p className="border-l-4 border-[var(--proof)] bg-[var(--proof)]/10 px-3 py-2 text-xs font-bold text-[var(--proof)]">
+                {error}
+              </p>
             )}
           </motion.div>
         ) : (
@@ -189,23 +198,24 @@ export function ImportBar({ isDemo, conversation, onImport, onSelectClips }: Pro
             transition={{ duration: 0.15 }}
             className="flex items-center gap-2 px-4 py-2.5"
           >
-            <div className="flex-1 flex items-center gap-1.5 min-w-0 overflow-hidden">
-              {platform && (
-                <span className="text-[11px] font-medium text-foreground/60 shrink-0">{platform}</span>
-              )}
-              <span className="text-[11px] text-muted-foreground/50 truncate">· {turnCount} 条对话</span>
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <p className="truncate text-xs font-black uppercase tracking-[0.16em]">
+                {platform ?? "Imported copy"} / {turnCount} turns
+              </p>
             </div>
             <button
               onClick={() => setExpanded(true)}
-              className="shrink-0 text-[11px] text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1 transition-colors"
+              className="flex items-center gap-1.5 border border-foreground px-2.5 py-1 text-[11px] font-bold uppercase hover:bg-foreground hover:text-background"
             >
-              重新导入
+              <RotateCcw className="h-3.5 w-3.5" />
+              Reimport
             </button>
             <button
               onClick={onSelectClips}
-              className="shrink-0 text-[11px] text-primary hover:text-primary/80 border border-primary/30 rounded-md px-2.5 py-1 transition-colors"
+              className="flex items-center gap-1.5 border-2 border-foreground bg-[var(--accent)] px-2.5 py-1 text-[11px] font-black uppercase transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:ink-shadow"
             >
-              选片段
+              <Scissors className="h-3.5 w-3.5" />
+              Select
             </button>
           </motion.div>
         )}

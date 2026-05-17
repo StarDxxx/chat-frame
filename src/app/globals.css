@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-editorial);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,38 +49,48 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --font-ui: "Aptos", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-editorial: "Georgia", "Times New Roman", serif;
+  --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  --paper: oklch(0.955 0.026 91.15);
+  --paper-soft: oklch(0.982 0.016 92.33);
+  --ink: oklch(0.167 0.012 73.2);
+  --ink-muted: oklch(0.43 0.024 73.9);
+  --proof: oklch(0.54 0.19 29.5);
+  --blueprint: oklch(0.39 0.12 248);
+  --newsline: oklch(0.64 0.035 82);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper-soft);
+  --card-foreground: var(--ink);
+  --popover: var(--paper-soft);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper-soft);
+  --secondary: oklch(0.91 0.026 89.8);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.89 0.025 88.6);
+  --muted-foreground: var(--ink-muted);
+  --accent: oklch(0.91 0.06 82);
+  --accent-foreground: var(--ink);
+  --destructive: var(--proof);
+  --border: var(--ink);
+  --input: var(--ink);
+  --ring: var(--proof);
+  --chart-1: var(--ink);
+  --chart-2: var(--proof);
+  --chart-3: var(--blueprint);
+  --chart-4: oklch(0.57 0.095 135);
+  --chart-5: oklch(0.72 0.09 84);
+  --radius: 0.35rem;
+  --sidebar: var(--paper-soft);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--ink);
+  --sidebar-primary-foreground: var(--paper-soft);
+  --sidebar-accent: oklch(0.91 0.026 89.8);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--ink);
+  --sidebar-ring: var(--proof);
 }
 
 .dark {
@@ -123,9 +133,54 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-ui);
+    background-image:
+      linear-gradient(rgba(31, 27, 21, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(31, 27, 21, 0.035) 1px, transparent 1px),
+      radial-gradient(circle at 30% 20%, rgba(139, 30, 24, 0.055), transparent 28rem);
+    background-size: 28px 28px, 28px 28px, 100% 100%;
   }
   html {
     @apply font-sans;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--proof) 24%, transparent);
+  }
+}
+
+@layer utilities {
+  .font-editorial {
+    font-family: var(--font-editorial);
+  }
+
+  .newsprint-panel {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0)),
+      var(--paper-soft);
+    border: 1.5px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+
+  .ink-shadow {
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  .proof-shadow {
+    box-shadow: 4px 4px 0 var(--proof);
+  }
+
+  .halftone {
+    background-image: radial-gradient(currentColor 0.7px, transparent 0.7px);
+    background-size: 7px 7px;
+  }
+
+  .ruled-paper {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 29px,
+      rgba(31, 27, 21, 0.12) 30px
+    );
   }
 }
 

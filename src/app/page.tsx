@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ImageDown, Newspaper, Scissors } from "lucide-react"
 import { ConversationEditor } from "@/components/editor/ConversationEditor"
 import { PreviewPanel } from "@/components/preview/PreviewPanel"
 import { SelectModal } from "@/components/dashboard/SelectModal"
@@ -33,7 +34,15 @@ const INITIAL: PageState = {
   editedTurns: initialSelectedTurns,
   themeCategory: "card",
   selectedTheme: "graphite",
-  settings: { showAvatars: true, showFooter: true, sizeId: "xiaohongshu", layoutFlow: "bottom-up", fontSize: 12, avatarUser: "我", avatarAI: "" },
+  settings: {
+    showAvatars: true,
+    showFooter: true,
+    sizeId: "xiaohongshu",
+    layoutFlow: "bottom-up",
+    fontSize: 12,
+    avatarUser: "我",
+    avatarAI: "",
+  },
   selectModalOpen: false,
 }
 
@@ -52,7 +61,6 @@ export default function Home() {
       selectedTurnIds: selectedIds,
       selectedTurns: selected,
       editedTurns: selected,
-      // open select modal for URL imports so user can pick clips
       selectModalOpen: conversation.source === "url",
     })
   }
@@ -75,29 +83,64 @@ export default function Home() {
     const pixelRatio = size.exportWidth / el.offsetWidth
     const dataUrl = await toPng(el, { pixelRatio })
     const link = document.createElement("a")
-    link.download = "ai-emo-card.png"
+    link.download = "ai-dialogue-press-card.png"
     link.href = dataUrl
     link.click()
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      {/* Header */}
-      <header className="shrink-0 h-13 border-b flex items-center px-5">
-        <span className="font-bold text-sm tracking-tight">✦ AI 对话卡片</span>
+    <div className="relative flex h-screen flex-col overflow-hidden bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.07] halftone text-foreground" />
+      <div className="pointer-events-none absolute left-5 top-0 h-full w-px bg-foreground/35" />
+      <div className="pointer-events-none absolute right-7 top-0 h-full w-px bg-[var(--proof)]/35" />
+
+      <header className="relative z-10 shrink-0 border-b-2 border-foreground bg-[var(--paper-soft)] px-5 py-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center border-2 border-foreground bg-[var(--proof)] text-primary-foreground ink-shadow">
+              <Newspaper className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-editorial text-2xl font-black leading-none tracking-normal">
+                AI Dialogue Press
+              </p>
+              <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                Edit, clip, typeset, export
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden items-center gap-2 md:flex">
+            <div className="flex items-center gap-1.5 border border-foreground bg-background px-2.5 py-1 text-[11px] font-bold uppercase">
+              <Scissors className="h-3.5 w-3.5" />
+              {state.selectedTurnIds.length} clips
+            </div>
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 border-2 border-foreground bg-foreground px-3 py-1.5 text-xs font-black uppercase text-background transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:proof-shadow"
+            >
+              <ImageDown className="h-4 w-4" />
+              Export
+            </button>
+          </div>
+        </div>
       </header>
 
-      {/* Main */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left: import bar + editable conversation */}
-        <div className="flex-[6] min-w-0 flex flex-col border-r overflow-hidden">
+      <main className="relative z-10 flex min-h-0 flex-1 gap-4 p-4">
+        <section className="newsprint-panel flex min-w-0 flex-[6] flex-col overflow-hidden">
+          <div className="flex items-center justify-between border-b-2 border-foreground bg-[var(--paper)] px-4 py-2">
+            <p className="font-editorial text-lg font-black">Copy Desk</p>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              source material
+            </span>
+          </div>
           <ImportBar
             isDemo={state.isDemo}
             conversation={state.conversation}
             onImport={handleImport}
             onSelectClips={() => update({ selectModalOpen: true })}
           />
-          <div className="flex-1 overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto ruled-paper">
             <ConversationEditor
               initialTurns={state.selectedTurns}
               isDemo={state.isDemo}
@@ -106,10 +149,15 @@ export default function Home() {
               onChange={(turns) => update({ editedTurns: turns })}
             />
           </div>
-        </div>
+        </section>
 
-        {/* Right: card preview + controls */}
-        <div className="flex-[4] min-w-0 flex flex-col">
+        <section className="newsprint-panel flex min-w-0 flex-[4] flex-col overflow-hidden">
+          <div className="flex items-center justify-between border-b-2 border-foreground bg-[var(--paper)] px-4 py-2">
+            <p className="font-editorial text-lg font-black">Print Proof</p>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              live plate
+            </span>
+          </div>
           <PreviewPanel
             turns={state.editedTurns}
             themeCategory={state.themeCategory}
@@ -122,10 +170,9 @@ export default function Home() {
             onSettingsChange={(patch) => update({ settings: { ...state.settings, ...patch } })}
             onExport={handleExport}
           />
-        </div>
-      </div>
+        </section>
+      </main>
 
-      {/* Select modal */}
       {state.selectModalOpen && (
         <SelectModal
           conversation={state.conversation}

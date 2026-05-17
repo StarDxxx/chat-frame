@@ -1,10 +1,11 @@
 "use client"
 
-import { useEditor, EditorContent } from "@tiptap/react"
+import { useEffect, useRef, useState } from "react"
+import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Underline from "@tiptap/extension-underline"
+import { Bold, EyeOff, Italic, Trash2, Underline as UnderlineIcon } from "lucide-react"
 import { BlurMark } from "@/lib/tiptap/blur-mark"
-import { useEffect, useRef, useState } from "react"
 import type { ConversationTurn } from "@/lib/types"
 
 interface Props {
@@ -19,17 +20,22 @@ interface Props {
 function ToolbarBtn({
   onClick,
   active,
+  label,
   children,
 }: {
   onClick: () => void
   active?: boolean
+  label: string
   children: React.ReactNode
 }) {
   return (
     <button
       onMouseDown={(e) => { e.preventDefault(); onClick() }}
-      className={`px-2 py-0.5 text-[11px] rounded font-medium transition-colors
-        ${active ? "bg-white text-gray-900" : "text-white/80 hover:text-white hover:bg-white/20"}`}
+      aria-label={label}
+      title={label}
+      className={`grid h-7 w-7 place-items-center border border-foreground text-[11px] transition-colors ${
+        active ? "bg-[var(--proof)] text-background" : "bg-[var(--paper-soft)] text-foreground hover:bg-foreground hover:text-background"
+      }`}
     >
       {children}
     </button>
@@ -58,15 +64,14 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
         return
       }
       setHasSelection(true)
-      // Position toolbar above the selection
       const sel = window.getSelection()
       if (sel && sel.rangeCount > 0 && containerRef.current) {
         const range = sel.getRangeAt(0)
         const selRect = range.getBoundingClientRect()
         const containerRect = containerRef.current.getBoundingClientRect()
         setToolbarPos({
-          top: selRect.top - containerRect.top - 36,
-          left: Math.max(0, selRect.left - containerRect.left + selRect.width / 2 - 100),
+          top: selRect.top - containerRect.top - 40,
+          left: Math.max(0, selRect.left - containerRect.left + selRect.width / 2 - 62),
         })
       }
     },
@@ -92,59 +97,54 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
   return (
     <div
       ref={containerRef}
-      className={`relative flex items-end gap-2 ${isUser ? "flex-row-reverse" : "flex-row"}`}
+      className={`relative flex items-end gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}
     >
-      {/* Floating toolbar */}
       {hasSelection && toolbarPos && (
         <div
-          className="absolute z-30 flex items-center gap-0.5 bg-gray-900 rounded-lg px-1.5 py-1 shadow-xl border border-white/10 pointer-events-auto"
+          className="absolute z-30 flex items-center gap-1 border-2 border-foreground bg-[var(--paper)] p-1 ink-shadow"
           style={{ top: toolbarPos.top, left: toolbarPos.left }}
         >
-          <ToolbarBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
-            <strong>B</strong>
+          <ToolbarBtn label="Bold" onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
+            <Bold className="h-3.5 w-3.5" />
           </ToolbarBtn>
-          <ToolbarBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
-            <em>I</em>
+          <ToolbarBtn label="Italic" onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
+            <Italic className="h-3.5 w-3.5" />
           </ToolbarBtn>
-          <ToolbarBtn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")}>
-            <span className="underline">U</span>
+          <ToolbarBtn label="Underline" onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")}>
+            <UnderlineIcon className="h-3.5 w-3.5" />
           </ToolbarBtn>
-          <div className="w-px h-3.5 bg-white/20 mx-0.5" />
-          <ToolbarBtn onClick={() => editor.chain().focus().toggleMark("blur").run()} active={editor.isActive("blur")}>
-            模糊
+          <ToolbarBtn label="Blur sensitive text" onClick={() => editor.chain().focus().toggleMark("blur").run()} active={editor.isActive("blur")}>
+            <EyeOff className="h-3.5 w-3.5" />
           </ToolbarBtn>
-          <ToolbarBtn onClick={() => editor.chain().focus().deleteSelection().run()}>
-            删除
+          <ToolbarBtn label="Delete selection" onClick={() => editor.chain().focus().deleteSelection().run()}>
+            <Trash2 className="h-3.5 w-3.5" />
           </ToolbarBtn>
         </div>
       )}
 
-      {/* Avatar */}
-      <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold mb-0.5 border
-        ${isUser
-          ? "bg-primary/10 text-primary border-primary/20"
-          : "bg-muted text-muted-foreground border-border"
-        }`}
-      >
+      <div className={`mb-1 grid h-8 w-8 shrink-0 place-items-center border-2 border-foreground text-[10px] font-black ${
+        isUser ? "bg-[var(--accent)]" : "bg-foreground text-background"
+      }`}>
         {avatarLabel}
       </div>
 
-      {/* Bubble + editor */}
-      <div className={`relative group max-w-[80%] flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
-        <div className={`rounded-2xl px-4 py-2.5
-          ${isUser
-            ? "rounded-br-sm bg-primary/10 border border-primary/20"
-            : "rounded-bl-sm bg-muted border border-border"
-          }`}
-        >
+      <div className={`group flex max-w-[82%] flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
+        <div className={`relative border-2 border-foreground px-4 py-3 ${
+          isUser
+            ? "bg-[var(--accent)] proof-shadow"
+            : "bg-[var(--paper-soft)] ink-shadow"
+        }`}>
+          <div className="mb-2 flex items-center gap-2 border-b border-foreground/35 pb-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted-foreground">
+            <span>{isUser ? "Source note" : "AI response"}</span>
+          </div>
           <EditorContent editor={editor} />
         </div>
 
         <button
           onClick={onDelete}
-          className={`opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-muted-foreground hover:text-destructive`}
+          className="opacity-0 transition-opacity text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground hover:text-[var(--proof)] group-hover:opacity-100"
         >
-          移除此轮
+          Remove turn
         </button>
       </div>
     </div>

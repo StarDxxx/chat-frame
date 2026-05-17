@@ -15,7 +15,7 @@ export function parseText(raw: string): Conversation {
   const userPrefixes = /^(User|Human|Q|你|问|人类)\s*[:：]/i
   const assistantPrefixes = /^(AI|Assistant|A|Claude|ChatGPT|DeepSeek|答)\s*[:：]/i
 
-  let hasExplicitRoles = lines.some(
+  const hasExplicitRoles = lines.some(
     (l) => userPrefixes.test(l) || assistantPrefixes.test(l)
   )
 
