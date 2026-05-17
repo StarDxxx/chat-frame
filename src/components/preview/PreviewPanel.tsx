@@ -32,6 +32,8 @@ const THEME_CATEGORIES: { id: ThemeCategoryId; label: string }[] = [
   { id: "classic", label: "Native AI" },
 ]
 
+const CHAT_APP_ASPECT_RATIO = "440/956"
+
 interface Props {
   turns: ConversationTurn[]
   themeCategory: ThemeCategoryId
@@ -93,7 +95,7 @@ export function PreviewPanel({
   const rulerRef = useRef<HTMLDivElement>(null)
 
   const size = getCardSize(settings.sizeId)
-  const aspectRatio = themeCategory === "chat-app" ? "9/19" : size.ratio
+  const aspectRatio = themeCategory === "chat-app" ? CHAT_APP_ASPECT_RATIO : size.ratio
 
   useEffect(() => {
     const el = cardWrapperRef.current
