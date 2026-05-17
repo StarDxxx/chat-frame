@@ -1,5 +1,6 @@
 "use client"
 
+import { ChevronDown, Mic, Plus } from "lucide-react"
 import type { CardSettings, ConversationTurn, PlatformId } from "@/lib/types"
 
 export type ClassicVariant = "claude" | "chatgpt" | "deepseek"
@@ -220,6 +221,167 @@ function DeepSeekPreview({ turns, settings, pageOffset, pageViewportHeight }: {
   )
 }
 
+function ChatGPTVoiceButton() {
+  return (
+    <div
+      style={{
+        width: 36,
+        height: 36,
+        borderRadius: "50%",
+        background: "#000",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2,
+        flexShrink: 0,
+      }}
+    >
+      {[8, 14, 19, 13, 8].map((height, index) => (
+        <span
+          key={index}
+          style={{
+            width: 2.5,
+            height,
+            borderRadius: 2,
+            background: "#fff",
+            opacity: index === 0 || index === 4 ? 0.78 : 1,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function ChatGPTInputBar() {
+  return (
+    <div
+      style={{
+        flexShrink: 0,
+        padding: "0 26px 12px",
+        background: "linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 34%)",
+      }}
+    >
+      <div
+        style={{
+          minHeight: 58,
+          borderRadius: 30,
+          border: "1px solid #d8d8d8",
+          background: "#fff",
+          boxShadow: "0 18px 45px rgba(0,0,0,0.11), 0 1px 2px rgba(0,0,0,0.08)",
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+          padding: "8px 10px 8px 18px",
+        }}
+      >
+        <Plus size={26} strokeWidth={1.8} color="#111" />
+        <span
+          style={{
+            flex: 1,
+            color: "#8e8e8e",
+            fontSize: 17,
+            lineHeight: 1,
+            whiteSpace: "nowrap",
+          }}
+        >
+          Ask anything
+        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#8a8a8a", fontSize: 14 }}>
+          <span>Instant</span>
+          <ChevronDown size={15} strokeWidth={2} />
+        </div>
+        <Mic size={24} strokeWidth={2.15} color="#111" />
+        <ChatGPTVoiceButton />
+      </div>
+      <p
+        style={{
+          margin: "8px 0 0",
+          textAlign: "center",
+          color: "#5f6368",
+          fontSize: 11,
+          lineHeight: 1.25,
+        }}
+      >
+        {"ChatGPT can make mistakes. OpenAI doesn't use star workspace data to train its models."}
+      </p>
+    </div>
+  )
+}
+
+function ChatGPTPreview({ turns, settings, pageOffset, pageViewportHeight }: {
+  turns: ConversationTurn[]
+  settings: CardSettings
+  pageOffset?: number
+  pageViewportHeight?: number
+}) {
+  const paginated = pageOffset !== undefined
+  const fs = settings.fontSize || 16
+
+  return (
+    <div
+      id="card-export"
+      className="relative w-full h-full overflow-hidden flex flex-col"
+      style={{
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif",
+        borderRadius: 16,
+        background: "#ffffff",
+        color: "#000",
+      }}
+    >
+      <div className="flex-1 relative overflow-hidden" style={pageViewportHeight ? { height: pageViewportHeight, flex: "none" } : {}}>
+        <div
+          style={{
+            minHeight: "100%",
+            padding: "54px 28px 120px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 48,
+            ...(paginated ? { transform: `translateY(-${pageOffset}px)` } : {}),
+          }}
+        >
+          {turns.map((turn) => {
+            const isUser = turn.role === "user"
+
+            if (isUser) {
+              return (
+                <div key={turn.id} style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <div
+                    style={{
+                      maxWidth: "68%",
+                      padding: "13px 18px",
+                      borderRadius: 28,
+                      background: "#f1f1f1",
+                      color: "#000",
+                      fontSize: fs,
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    {isHtml(turn.content)
+                      ? <div className="prose-card" dangerouslySetInnerHTML={{ __html: turn.content }} />
+                      : <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{turn.content}</p>
+                    }
+                  </div>
+                </div>
+              )
+            }
+
+            return (
+              <div key={turn.id} style={{ maxWidth: "82%", color: "#000", fontSize: fs, lineHeight: 1.55 }}>
+                {isHtml(turn.content)
+                  ? <div className="prose-card" dangerouslySetInnerHTML={{ __html: turn.content }} />
+                  : <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{turn.content}</p>
+                }
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      <ChatGPTInputBar />
+    </div>
+  )
+}
+
 interface Props {
   variant: ClassicVariant
   turns: ConversationTurn[]
@@ -236,6 +398,10 @@ export function ClassicPreview({ variant, turns, settings, pageOffset, pageViewp
 
   if (variant === "deepseek") {
     return <DeepSeekPreview turns={turns} settings={settings} pageOffset={pageOffset} pageViewportHeight={pageViewportHeight} />
+  }
+
+  if (variant === "chatgpt") {
+    return <ChatGPTPreview turns={turns} settings={settings} pageOffset={pageOffset} pageViewportHeight={pageViewportHeight} />
   }
 
   return (
