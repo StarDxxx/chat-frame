@@ -9,6 +9,8 @@ import { SelectModal } from "@/components/dashboard/SelectModal"
 import { ImportBar } from "@/components/import/ImportBar"
 import { getPlaceholderForLocale } from "@/lib/placeholder"
 import { DEFAULT_FONT_ID } from "@/lib/fonts"
+
+const DEFAULT_AVATAR_USER: Record<Locale, string> = { zh: "我", en: "Me", ja: "私" }
 import { getCardSize } from "@/lib/card-sizes"
 import { LocaleProvider, useLocale, type Locale } from "@/lib/i18n"
 import { TAGLINES } from "@/lib/i18n/taglines"
@@ -132,7 +134,11 @@ function AppContent() {
     if (!state.isDemo) return
     update({
       ...buildDemoState(locale),
-      settings: { ...state.settings, fontId: DEFAULT_FONT_ID[locale] },
+      settings: {
+        ...state.settings,
+        fontId: DEFAULT_FONT_ID[locale],
+        avatarUser: DEFAULT_AVATAR_USER[locale],
+      },
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale])

@@ -298,7 +298,7 @@ export function PreviewPanel({
                         <input
                           className="mt-1 h-7 w-full border border-foreground bg-background px-1.5 text-center text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[var(--proof)]"
                           maxLength={4}
-                          placeholder="Me"
+                          placeholder={locale === "zh" ? "我" : locale === "ja" ? "私" : "Me"}
                           value={settings.avatarUser}
                           onChange={(e) => onSettingsChange({ avatarUser: e.target.value })}
                         />

@@ -27,11 +27,12 @@ interface Props {
 }
 
 export function CardPreview({ turns, themeId, platform, settings, title, minHeight }: Props) {
-  const { locale } = useLocale()
+  const { locale, t } = useLocale()
   const fontFamily = getFontFamily(locale, settings.fontId)
   const aiAvatarDefault = PLATFORM_AVATAR[platform ?? "text"]
   const aiAvatar = settings.avatarAI || aiAvatarDefault
-  const userAvatar = settings.avatarUser || "我"
+  const USER_AVATAR_DEFAULT: Record<string, string> = { zh: "我", en: "Me", ja: "私" }
+  const userAvatar = settings.avatarUser || USER_AVATAR_DEFAULT[locale] || "Me"
   const theme = getTheme(themeId)
   const dateStamp = settings.showDate ? formatDateStamp(locale) : null
 
@@ -111,7 +112,7 @@ export function CardPreview({ turns, themeId, platform, settings, title, minHeig
         {settings.showFooter && (
           <div className="pt-1 flex items-center justify-between">
             <span className={`text-[9px] ${theme.accentColor} opacity-50`}>AI Frame</span>
-            <span className={`text-[9px] ${theme.accentColor} opacity-50`}>{theme.label}</span>
+            <span className={`text-[9px] ${theme.accentColor} opacity-50`}>{t(`themes.${themeId}`)}</span>
           </div>
         )}
       </div>
