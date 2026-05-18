@@ -69,31 +69,6 @@ const CONFIGS: Record<ClassicVariant, Cfg> = {
   },
 }
 
-function ClaudeIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="white">
-      <path d="M7 0 C7 0 7.6 4.4 7.6 7 C7.6 9.6 7 14 7 14 C7 14 6.4 9.6 6.4 7 C6.4 4.4 7 0 7 0Z" />
-      <path d="M0 7 C0 7 4.4 6.4 7 6.4 C9.6 6.4 14 7 14 7 C14 7 9.6 7.6 7 7.6 C4.4 7.6 0 7 0 7Z" />
-    </svg>
-  )
-}
-
-function ChatGPTIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="white" opacity="0.9">
-      <circle cx="7" cy="7" r="2" />
-      {[0, 60, 120, 180, 240, 300].map((deg) => {
-        const rad = (deg * Math.PI) / 180
-        const x1 = 7 + 2.5 * Math.cos(rad)
-        const y1 = 7 + 2.5 * Math.sin(rad)
-        const x2 = 7 + 6 * Math.cos(rad)
-        const y2 = 7 + 6 * Math.sin(rad)
-        return <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth="1.4" strokeLinecap="round" />
-      })}
-    </svg>
-  )
-}
-
 function DeepSeekIcon({ size = 20 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 56.6 41.4" fill="none">
@@ -102,39 +77,6 @@ function DeepSeekIcon({ size = 20 }: { size?: number }) {
         fill="currentColor"
       />
     </svg>
-  )
-}
-
-const AVATAR_ICON: Record<ClassicVariant, React.ReactNode> = {
-  claude: <ClaudeIcon />,
-  chatgpt: <ChatGPTIcon />,
-  deepseek: <DeepSeekIcon size={16} />,
-}
-
-function Header({ cfg, variant }: { cfg: Cfg; variant: ClassicVariant }) {
-  return (
-    <div style={{ height: 48, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderBottom: `1px solid ${cfg.border}`, flexShrink: 0 }}>
-      <div style={{ width: 22, height: 22, borderRadius: "50%", background: cfg.avatarBg, color: "white", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        {AVATAR_ICON[variant]}
-      </div>
-      <span style={{ fontSize: 15, fontWeight: 600, color: cfg.brandColor, letterSpacing: -0.2 }}>{cfg.brandName}</span>
-      <span style={{ fontSize: 11, color: cfg.muted, background: `${cfg.muted}22`, padding: "2px 8px", borderRadius: 10, letterSpacing: 0.1 }}>{cfg.modelName}</span>
-    </div>
-  )
-}
-
-function InputBar({ cfg }: { cfg: Cfg }) {
-  return (
-    <div style={{ flexShrink: 0, padding: "10px 14px 12px", borderTop: `1px solid ${cfg.border}` }}>
-      <div style={{ height: 38, borderRadius: 10, background: cfg.inputBg, border: `1px solid ${cfg.border}`, display: "flex", alignItems: "center", padding: "0 10px 0 14px", gap: 8 }}>
-        <span style={{ flex: 1, fontSize: 13, color: cfg.muted }}>{cfg.placeholder}</span>
-        <div style={{ width: 26, height: 26, borderRadius: "50%", background: `${cfg.muted}44`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M6 10V2M2.5 5.5L6 2l3.5 3.5" stroke={cfg.muted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      </div>
-    </div>
   )
 }
 
@@ -377,7 +319,149 @@ function ChatGPTPreview({ turns, settings, pageOffset, pageViewportHeight }: {
         </div>
       </div>
 
-      <ChatGPTInputBar />
+      {settings.showFooter && <ChatGPTInputBar />}
+    </div>
+  )
+}
+
+function ClaudeVoiceBars() {
+  return (
+    <div style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", gap: 3, color: "#2d2b28" }}>
+      {[13, 21, 26, 18, 24].map((height, index) => (
+        <span
+          key={index}
+          style={{
+            width: 2,
+            height,
+            borderRadius: 2,
+            background: "currentColor",
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function ClaudeInputBar() {
+  return (
+    <div
+      style={{
+        flexShrink: 0,
+        padding: "0 24px 12px",
+        background: "linear-gradient(180deg, rgba(250,249,245,0) 0%, #fbfaf7 30%)",
+      }}
+    >
+      <div
+        style={{
+          minHeight: 102,
+          borderRadius: 22,
+          border: "1px solid #dedbd4",
+          background: "#ffffff",
+          boxShadow: "0 18px 42px rgba(79, 70, 60, 0.10), 0 1px 2px rgba(79, 70, 60, 0.07)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "20px 18px 16px",
+        }}
+      >
+        <div style={{ color: "#838079", fontSize: 18, lineHeight: 1.15 }}>Write a message...</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <Plus size={26} strokeWidth={1.6} color="#2d2b28" />
+          <div style={{ flex: 1 }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#33302c", fontSize: 15 }}>
+            <span>Sonnet 4.6</span>
+            <ChevronDown size={15} strokeWidth={1.8} />
+          </div>
+          <ClaudeVoiceBars />
+        </div>
+      </div>
+      <p style={{ margin: "8px 0 0", textAlign: "center", color: "#7c766c", fontSize: 12, lineHeight: 1.25 }}>
+        Claude is AI and can make mistakes. Please double-check responses.
+      </p>
+    </div>
+  )
+}
+
+function ClaudePreview({ turns, settings, pageOffset, pageViewportHeight }: {
+  turns: ConversationTurn[]
+  settings: CardSettings
+  pageOffset?: number
+  pageViewportHeight?: number
+}) {
+  const paginated = pageOffset !== undefined
+  const fs = settings.fontSize || 17
+
+  return (
+    <div
+      id="card-export"
+      className="relative w-full h-full overflow-hidden flex flex-col"
+      style={{
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        borderRadius: 16,
+        background: "#fbfaf7",
+        color: "#171512",
+      }}
+    >
+      <div className="flex-1 relative overflow-hidden" style={pageViewportHeight ? { height: pageViewportHeight, flex: "none" } : {}}>
+        <div
+          style={{
+            minHeight: "100%",
+            padding: "58px 28px 134px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 30,
+            ...(paginated ? { transform: `translateY(-${pageOffset}px)` } : {}),
+          }}
+        >
+          {turns.map((turn) => {
+            const isUser = turn.role === "user"
+
+            if (isUser) {
+              return (
+                <div key={turn.id} style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <div
+                    style={{
+                      maxWidth: "66%",
+                      padding: "13px 18px",
+                      borderRadius: 18,
+                      background: "#f0efec",
+                      color: "#171512",
+                      fontSize: fs,
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    {isHtml(turn.content)
+                      ? <div className="prose-card" dangerouslySetInnerHTML={{ __html: turn.content }} />
+                      : <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{turn.content}</p>
+                    }
+                  </div>
+                </div>
+              )
+            }
+
+            return (
+              <div key={turn.id} style={{ maxWidth: "86%" }}>
+                <div
+                  style={{
+                    color: "#171512",
+                    fontFamily: "Georgia, 'Times New Roman', serif",
+                    fontSize: fs,
+                    lineHeight: 1.48,
+                    letterSpacing: 0,
+                  }}
+                >
+                  {isHtml(turn.content)
+                    ? <div className="prose-card" dangerouslySetInnerHTML={{ __html: turn.content }} />
+                    : <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{turn.content}</p>
+                  }
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {settings.showFooter && <ClaudeInputBar />}
     </div>
   )
 }
@@ -392,10 +476,6 @@ interface Props {
 }
 
 export function ClassicPreview({ variant, turns, settings, pageOffset, pageViewportHeight }: Props) {
-  const paginated = pageOffset !== undefined
-  const fs = settings.fontSize || 14
-  const cfg = CONFIGS[variant]
-
   if (variant === "deepseek") {
     return <DeepSeekPreview turns={turns} settings={settings} pageOffset={pageOffset} pageViewportHeight={pageViewportHeight} />
   }
@@ -404,46 +484,5 @@ export function ClassicPreview({ variant, turns, settings, pageOffset, pageViewp
     return <ChatGPTPreview turns={turns} settings={settings} pageOffset={pageOffset} pageViewportHeight={pageViewportHeight} />
   }
 
-  return (
-    <div id="card-export" className="relative w-full h-full overflow-hidden flex flex-col" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", borderRadius: 16, background: cfg.bg }}>
-      <Header cfg={cfg} variant={variant} />
-
-      <div className="flex-1 relative overflow-hidden" style={pageViewportHeight ? { height: pageViewportHeight, flex: "none" } : {}}>
-        <div style={{ padding: "16px 18px 12px", display: "flex", flexDirection: "column", gap: 18, ...(paginated ? { transform: `translateY(-${pageOffset}px)` } : {}) }}>
-          {turns.map((turn) => {
-            const isUser = turn.role === "user"
-
-            if (isUser) {
-              return (
-                <div key={turn.id} style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <div style={{ maxWidth: "78%", padding: "10px 14px", borderRadius: "18px 18px 4px 18px", background: cfg.userBubbleBg, color: cfg.userText, fontSize: fs, lineHeight: 1.55 }}>
-                    {isHtml(turn.content)
-                      ? <div className="prose-card" dangerouslySetInnerHTML={{ __html: turn.content }} />
-                      : <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{turn.content}</p>
-                    }
-                  </div>
-                </div>
-              )
-            }
-
-            return (
-              <div key={turn.id} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <div style={{ width: 26, height: 26, borderRadius: "50%", background: cfg.avatarBg, color: "white", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
-                  {AVATAR_ICON[variant]}
-                </div>
-                <div style={{ flex: 1, color: cfg.assistantText, fontSize: fs, lineHeight: 1.65, paddingTop: 2 }}>
-                  {isHtml(turn.content)
-                    ? <div className="prose-card" dangerouslySetInnerHTML={{ __html: turn.content }} />
-                    : <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{turn.content}</p>
-                  }
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      <InputBar cfg={cfg} />
-    </div>
-  )
+  return <ClaudePreview turns={turns} settings={settings} pageOffset={pageOffset} pageViewportHeight={pageViewportHeight} />
 }
