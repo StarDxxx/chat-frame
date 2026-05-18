@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
-import { ImageDown, Newspaper, Scissors } from "lucide-react"
+import { Eye, ImageDown, Newspaper, Pencil, Scissors } from "lucide-react"
 import { ConversationEditor } from "@/components/editor/ConversationEditor"
 import { PreviewPanel } from "@/components/preview/PreviewPanel"
 import { SelectModal } from "@/components/dashboard/SelectModal"
@@ -75,13 +75,11 @@ function RotatingTagline() {
   const { locale } = useLocale()
   const lines = TAGLINES[locale]
 
-  // Shuffle once per locale, then step through
-  const [shuffled, setShuffled] = useState<string[]>(() => shuffle(lines))
+  const [shuffled, setShuffled] = useState<string[]>(lines)
   const [idx, setIdx] = useState(0)
 
   useEffect(() => {
-    const next = shuffle(TAGLINES[locale])
-    setShuffled(next)
+    setShuffled(shuffle(TAGLINES[locale]))
     setIdx(0)
   }, [locale])
 
@@ -126,6 +124,7 @@ export default function Home() {
 function AppContent() {
   const { locale, setLocale, t } = useLocale()
   const [state, setState] = useState<PageState>(INITIAL)
+  const [mobileTab, setMobileTab] = useState<"editor" | "preview">("editor")
 
   const update = (patch: Partial<PageState>) =>
     setState((prev) => ({ ...prev, ...patch }))
@@ -235,7 +234,7 @@ function AppContent() {
       </header>
 
       <main className="relative z-10 flex min-h-0 flex-1 gap-3 p-2">
-        <section className="newsprint-panel flex min-w-0 flex-[6] flex-col overflow-hidden">
+        <section className={`newsprint-panel flex-col overflow-hidden md:flex md:min-w-0 md:flex-[6] ${mobileTab === "editor" ? "flex flex-1" : "hidden"}`}>
           <div className="flex items-center justify-between border-b-2 border-foreground bg-[var(--paper)] px-4 py-1">
             <p className="font-editorial text-base font-black">{t("panels.copyDesk")}</p>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
@@ -259,7 +258,7 @@ function AppContent() {
           </div>
         </section>
 
-        <section className="newsprint-panel flex min-w-0 flex-[4] flex-col overflow-hidden">
+        <section className={`newsprint-panel flex-col overflow-hidden md:flex md:min-w-0 md:flex-[4] ${mobileTab === "preview" ? "flex flex-1" : "hidden"}`}>
           <div className="flex items-center justify-between border-b-2 border-foreground bg-[var(--paper)] px-4 py-1">
             <p className="font-editorial text-base font-black">{t("panels.printProof")}</p>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
@@ -280,6 +279,43 @@ function AppContent() {
           />
         </section>
       </main>
+
+      {/* Mobile bottom tab bar */}
+      <nav className="relative z-10 shrink-0 border-t-2 border-foreground bg-[var(--paper-soft)] md:hidden">
+        <div className="pointer-events-none absolute left-5 top-0 h-full w-px bg-foreground/35" />
+        <div className="pointer-events-none absolute right-7 top-0 h-full w-px bg-[var(--proof)]/35" />
+        <div className="flex h-14">
+          <button
+            onClick={() => setMobileTab("editor")}
+            className={`flex flex-1 flex-col items-center justify-center gap-0.5 border-r-2 border-foreground transition-colors ${
+              mobileTab === "editor"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:bg-muted"
+            }`}
+          >
+            <Pencil className="h-4 w-4" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em]">{t("mobile.tabEdit")}</span>
+          </button>
+          <button
+            onClick={() => setMobileTab("preview")}
+            className={`flex flex-1 flex-col items-center justify-center gap-0.5 border-r-2 border-foreground transition-colors ${
+              mobileTab === "preview"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:bg-muted"
+            }`}
+          >
+            <Eye className="h-4 w-4" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em]">{t("mobile.tabPreview")}</span>
+          </button>
+          <button
+            onClick={handleExport}
+            className="flex flex-1 flex-col items-center justify-center gap-0.5 bg-[var(--proof)] text-primary-foreground transition-opacity active:opacity-75"
+          >
+            <ImageDown className="h-4 w-4" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em]">{t("header.export")}</span>
+          </button>
+        </div>
+      </nav>
 
       {state.selectModalOpen && (
         <SelectModal

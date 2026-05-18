@@ -9,6 +9,10 @@ export type Translations = {
     clips: string
     export: string
   }
+  mobile: {
+    tabEdit: string
+    tabPreview: string
+  }
   panels: {
     copyDesk: string
     sourceMaterial: string
@@ -93,6 +97,10 @@ const en: Translations = {
   header: {
     clips: "{n} clips",
     export: "Export",
+  },
+  mobile: {
+    tabEdit: "Edit",
+    tabPreview: "Preview",
   },
   panels: {
     copyDesk: "Copy Desk",
@@ -179,6 +187,10 @@ const zh: Translations = {
     clips: "{n} 条",
     export: "导出",
   },
+  mobile: {
+    tabEdit: "编辑",
+    tabPreview: "预览",
+  },
   panels: {
     copyDesk: "稿件台",
     sourceMaterial: "原始素材",
@@ -263,6 +275,10 @@ const ja: Translations = {
   header: {
     clips: "{n} 件",
     export: "書き出し",
+  },
+  mobile: {
+    tabEdit: "編集",
+    tabPreview: "プレビュー",
   },
   panels: {
     copyDesk: "原稿台",

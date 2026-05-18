@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
-import Underline from "@tiptap/extension-underline"
 import { Bold, EyeOff, Italic, Trash2, Underline as UnderlineIcon } from "lucide-react"
 import { BlurMark } from "@/lib/tiptap/blur-mark"
 import type { ConversationTurn } from "@/lib/types"
@@ -53,7 +52,7 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
 
   const editor = useEditor({
     immediatelyRender: false,
-    extensions: [StarterKit, Underline, BlurMark],
+    extensions: [StarterKit, BlurMark],
     content: initialHtml,
     onUpdate({ editor }) {
       onChange(editor.getHTML())
