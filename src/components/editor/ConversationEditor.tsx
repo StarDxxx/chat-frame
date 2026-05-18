@@ -75,7 +75,7 @@ export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI,
   }
 
   return (
-    <div className="flex flex-col gap-2 p-4">
+    <div className="flex flex-col gap-1.5 p-2">
       {isDemo && (
         <div className="mx-auto border border-foreground bg-[var(--accent)] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
           {t("editor.sampleBanner")}

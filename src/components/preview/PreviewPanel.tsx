@@ -109,9 +109,9 @@ export function PreviewPanel({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col items-center gap-4 overflow-y-auto bg-[var(--paper)] p-6">
+      <div className="flex min-h-0 flex-1 flex-col items-center gap-4 overflow-y-auto bg-[var(--paper)] p-2">
         <div
-          className="border-2 border-foreground bg-background p-2 ink-shadow"
+          className="my-auto border-2 border-foreground bg-background p-1 ink-shadow"
           style={{ width: cardWidth }}
         >
           {themeCategory === "chat-app" ? (
@@ -134,13 +134,13 @@ export function PreviewPanel({
         </div>
       </div>
 
-      <div className="shrink-0 space-y-2 border-t-2 border-foreground bg-[var(--paper-soft)] p-3">
+      <div className="shrink-0 space-y-1 border-t-2 border-foreground bg-[var(--paper-soft)] p-2">
         <div className="flex gap-1.5 overflow-x-auto pb-0.5">
           {THEME_CATEGORY_IDS.map((id) => (
             <button
               key={id}
               onClick={() => onThemeCategoryChange(id)}
-              className={`shrink-0 border-2 border-foreground px-3 py-1 text-xs font-black uppercase transition-transform ${
+              className={`shrink-0 border-2 border-foreground px-2.5 py-0.5 text-[11px] font-black uppercase transition-transform ${
                 themeCategory === id
                   ? "bg-foreground text-background"
                   : "bg-background text-foreground hover:-translate-x-0.5 hover:-translate-y-0.5 hover:ink-shadow"
@@ -152,12 +152,12 @@ export function PreviewPanel({
         </div>
 
         {themeCategory === "chat-app" && (
-          <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+          <div className="flex gap-1.5 overflow-x-auto">
             {CHAT_VARIANTS.map((v) => (
               <button
                 key={v.id}
                 onClick={() => setChatVariant(v.id)}
-                className={`shrink-0 border border-foreground px-3 py-1 text-xs font-bold uppercase ${
+                className={`shrink-0 border border-foreground px-2.5 py-0.5 text-[11px] font-bold uppercase ${
                   chatVariant === v.id ? "bg-[var(--accent)]" : "bg-background hover:bg-muted"
                 }`}
               >
@@ -168,16 +168,16 @@ export function PreviewPanel({
         )}
 
         {themeCategory === "card" && (
-          <div className="flex gap-2 overflow-x-auto pb-0.5">
+          <div className="flex gap-1.5 overflow-x-auto">
             {THEMES.map((theme) => (
               <button
                 key={theme.id}
                 onClick={() => onThemeChange(theme.id as EmotionThemeId)}
-                className={`flex shrink-0 items-center gap-2 border border-foreground px-2 py-1 text-xs font-bold uppercase ${
+                className={`flex shrink-0 items-center gap-1.5 border border-foreground px-2 py-0.5 text-[11px] font-bold uppercase ${
                   themeId === theme.id ? "bg-[var(--accent)]" : "bg-background hover:bg-muted"
                 }`}
               >
-                <span className={`h-4 w-4 border border-foreground bg-gradient-to-br ${theme.gradient}`} />
+                <span className={`h-3.5 w-3.5 border border-foreground bg-gradient-to-br ${theme.gradient}`} />
                 {t(`themes.${theme.id}`)}
               </button>
             ))}
@@ -185,12 +185,12 @@ export function PreviewPanel({
         )}
 
         {themeCategory === "classic" && (
-          <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+          <div className="flex gap-1.5 overflow-x-auto">
             {CLASSIC_VARIANTS.map((v) => (
               <button
                 key={v.id}
                 onClick={() => setClassicVariant(v.id)}
-                className={`shrink-0 border border-foreground px-3 py-1 text-xs font-bold uppercase ${
+                className={`shrink-0 border border-foreground px-2.5 py-0.5 text-[11px] font-bold uppercase ${
                   classicVariant === v.id ? "bg-[var(--accent)]" : "bg-background hover:bg-muted"
                 }`}
               >
@@ -202,13 +202,13 @@ export function PreviewPanel({
 
         {/* Width selector — hidden for Chat App (fixed iPhone width) */}
         {!isChatApp && (
-          <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+          <div className="flex gap-1.5 overflow-x-auto">
             {CARD_SIZES.map((s) => (
               <button
                 key={s.id}
                 onClick={() => onSizeChange(s.id)}
                 title={`${s.previewWidth}px`}
-                className={`shrink-0 border border-foreground px-3 py-1 text-xs font-bold uppercase ${
+                className={`shrink-0 border border-foreground px-2.5 py-0.5 text-[11px] font-bold uppercase ${
                   settings.sizeId === s.id ? "bg-foreground text-background" : "bg-background hover:bg-muted"
                 }`}
               >
@@ -222,11 +222,11 @@ export function PreviewPanel({
           <div className="relative">
             <button
               onClick={() => setSettingsOpen((v) => !v)}
-              className="grid h-9 w-9 place-items-center border-2 border-foreground bg-background hover:bg-foreground hover:text-background"
+              className="grid h-7 w-7 place-items-center border-2 border-foreground bg-background hover:bg-foreground hover:text-background"
               aria-label="Card settings"
               title="Settings"
             >
-              <Settings2 className="h-4 w-4" />
+              <Settings2 className="h-3.5 w-3.5" />
             </button>
 
             {settingsOpen && (
@@ -334,9 +334,9 @@ export function PreviewPanel({
 
           <button
             onClick={onExport}
-            className="flex h-9 flex-1 items-center justify-center gap-2 border-2 border-foreground bg-foreground text-xs font-black uppercase text-background transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:proof-shadow"
+            className="flex h-7 flex-1 items-center justify-center gap-1.5 border-2 border-foreground bg-foreground text-[11px] font-black uppercase text-background transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:proof-shadow"
           >
-            <ImageDown className="h-4 w-4" />
+            <ImageDown className="h-3.5 w-3.5" />
             {t("preview.exportPng")}
           </button>
         </div>

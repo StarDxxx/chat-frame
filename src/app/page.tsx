@@ -185,7 +185,7 @@ function AppContent() {
       <div className="pointer-events-none absolute left-5 top-0 h-full w-px bg-foreground/35" />
       <div className="pointer-events-none absolute right-7 top-0 h-full w-px bg-[var(--proof)]/35" />
 
-      <header className="relative z-10 shrink-0 border-b-2 border-foreground bg-[var(--paper-soft)] px-5 py-3">
+      <header className="relative z-10 shrink-0 border-b-2 border-foreground bg-[var(--paper-soft)] px-5 py-2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="grid h-10 w-10 place-items-center border-2 border-foreground bg-[var(--proof)] text-primary-foreground ink-shadow">
@@ -234,10 +234,10 @@ function AppContent() {
         </div>
       </header>
 
-      <main className="relative z-10 flex min-h-0 flex-1 gap-4 p-4">
+      <main className="relative z-10 flex min-h-0 flex-1 gap-3 p-2">
         <section className="newsprint-panel flex min-w-0 flex-[6] flex-col overflow-hidden">
-          <div className="flex items-center justify-between border-b-2 border-foreground bg-[var(--paper)] px-4 py-2">
-            <p className="font-editorial text-lg font-black">{t("panels.copyDesk")}</p>
+          <div className="flex items-center justify-between border-b-2 border-foreground bg-[var(--paper)] px-4 py-1">
+            <p className="font-editorial text-base font-black">{t("panels.copyDesk")}</p>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
               {t("panels.sourceMaterial")}
             </span>
@@ -260,8 +260,8 @@ function AppContent() {
         </section>
 
         <section className="newsprint-panel flex min-w-0 flex-[4] flex-col overflow-hidden">
-          <div className="flex items-center justify-between border-b-2 border-foreground bg-[var(--paper)] px-4 py-2">
-            <p className="font-editorial text-lg font-black">{t("panels.printProof")}</p>
+          <div className="flex items-center justify-between border-b-2 border-foreground bg-[var(--paper)] px-4 py-1">
+            <p className="font-editorial text-base font-black">{t("panels.printProof")}</p>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
               {t("panels.livePlate")}
             </span>

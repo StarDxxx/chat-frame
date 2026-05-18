@@ -83,7 +83,7 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
     },
     editorProps: {
       attributes: {
-        class: "outline-none min-h-[1.5rem] text-sm leading-relaxed",
+        class: "outline-none min-h-[1.5rem] text-xs leading-snug",
       },
     },
   })
@@ -126,13 +126,13 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
           </div>
         )}
 
-        <div className={`mb-1 grid h-8 w-8 shrink-0 place-items-center border-2 border-foreground text-[10px] font-black ${
+        <div className={`mb-1 grid h-7 w-7 shrink-0 place-items-center border-2 border-foreground text-[9px] font-black ${
           isUser ? "bg-[var(--accent)]" : "bg-foreground text-background"
         }`}>
           {avatarLabel}
         </div>
 
-        <div className={`relative max-w-[82%] border-2 border-foreground px-3 py-2 ${
+        <div className={`relative max-w-[82%] border-2 border-foreground px-2.5 py-1.5 ${
           isUser
             ? "bg-[var(--accent)] proof-shadow"
             : "bg-[var(--paper-soft)] ink-shadow"
@@ -142,7 +142,7 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
       </div>
 
       {/* Remove button sits below the bubble, offset to skip the avatar column */}
-      <div className={`mt-1 flex ${isUser ? "justify-end " + bubbleOffset : "justify-start " + bubbleOffset}`}>
+      <div className={`mt-0.5 flex ${isUser ? "justify-end " + bubbleOffset : "justify-start " + bubbleOffset}`}>
         <button
           onClick={onDelete}
           className="opacity-0 transition-opacity text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground hover:text-[var(--proof)] group-hover:opacity-100"
