@@ -86,7 +86,7 @@ export type Translations = {
 
 const en: Translations = {
   brand: {
-    name: "Chat Frame",
+    name: "AI Frame",
     tagline: "Edit · Clip · Typeset · Export",
   },
   header: {
@@ -170,7 +170,7 @@ const en: Translations = {
 
 const zh: Translations = {
   brand: {
-    name: "Chat Frame",
+    name: "AI Frame",
     tagline: "剪辑 · 排版 · 导出",
   },
   header: {
@@ -254,7 +254,7 @@ const zh: Translations = {
 
 const ja: Translations = {
   brand: {
-    name: "Chat Frame",
+    name: "AI Frame",
     tagline: "編集・切り抜き・組版",
   },
   header: {

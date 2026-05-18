@@ -108,7 +108,7 @@ export function CardPreview({ turns, themeId, platform, settings, title, minHeig
 
         {settings.showFooter && (
           <div className="pt-1 flex items-center justify-between">
-            <span className={`text-[9px] ${theme.accentColor} opacity-50`}>Chat Frame</span>
+            <span className={`text-[9px] ${theme.accentColor} opacity-50`}>AI Frame</span>
             <span className={`text-[9px] ${theme.accentColor} opacity-50`}>{theme.label}</span>
           </div>
         )}

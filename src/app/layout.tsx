@@ -19,7 +19,7 @@ const notoSerifJP = Noto_Serif_JP({
 })
 
 export const metadata: Metadata = {
-  title: "Chat Frame",
+  title: "AI Frame",
   description: "Turn AI conversations into editorial share cards.",
 }
 
