@@ -46,6 +46,7 @@ export interface CardSettings {
   fontSize: number
   avatarUser: string
   avatarAI: string
+  fontId: string
 }
 
 export interface DashboardState {

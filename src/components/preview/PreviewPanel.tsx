@@ -10,6 +10,7 @@ import { ClassicPreview } from "@/components/classic/ClassicPreview"
 import type { ClassicVariant } from "@/components/classic/ClassicPreview"
 import { THEMES } from "@/lib/themes"
 import { CARD_SIZES, getCardSize } from "@/lib/card-sizes"
+import { FONT_OPTIONS } from "@/lib/fonts"
 import type { CardSettings, CardSizeId, ConversationTurn, EmotionThemeId, PlatformId, ThemeCategoryId } from "@/lib/types"
 import { useLocale } from "@/lib/i18n"
 
@@ -81,7 +82,7 @@ export function PreviewPanel({
   onSettingsChange,
   onExport,
 }: Props) {
-  const { t } = useLocale()
+  const { locale, t } = useLocale()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [chatVariant, setChatVariant] = useState<ChatVariant>("imessage")
   const [classicVariant, setClassicVariant] = useState<ClassicVariant>("claude")
@@ -251,6 +252,37 @@ export function PreviewPanel({
                       >
                         +
                       </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
+                      <Type className="h-3.5 w-3.5" />
+                      {t("preview.font")}
+                    </span>
+                    <div className="flex gap-1">
+                      {FONT_OPTIONS[locale].map((font) => (
+                        <button
+                          key={font.id}
+                          title={font.label}
+                          onClick={() => onSettingsChange({ fontId: font.id })}
+                          className={`flex flex-1 flex-col items-center gap-0.5 border py-1.5 transition-colors ${
+                            settings.fontId === font.id
+                              ? "border-foreground bg-[var(--accent)]"
+                              : "border-foreground/40 hover:border-foreground"
+                          }`}
+                        >
+                          <span
+                            className="text-base leading-none"
+                            style={{ fontFamily: `var(${font.cssVar}), ${font.fallback}` }}
+                          >
+                            {font.sample}
+                          </span>
+                          <span className="text-[9px] font-bold tracking-wide text-muted-foreground">
+                            {font.label}
+                          </span>
+                        </button>
+                      ))}
                     </div>
                   </div>
 

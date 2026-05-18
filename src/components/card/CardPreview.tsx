@@ -3,6 +3,7 @@
 import { getTheme } from "@/lib/themes"
 import { formatDateStamp } from "@/lib/date-stamp"
 import { useLocale } from "@/lib/i18n"
+import { getFontFamily } from "@/lib/fonts"
 import type { CardSettings, ConversationTurn, EmotionThemeId, PlatformId } from "@/lib/types"
 
 const PLATFORM_AVATAR: Record<PlatformId, string> = {
@@ -27,6 +28,7 @@ interface Props {
 
 export function CardPreview({ turns, themeId, platform, settings, title, minHeight }: Props) {
   const { locale } = useLocale()
+  const fontFamily = getFontFamily(locale, settings.fontId)
   const aiAvatarDefault = PLATFORM_AVATAR[platform ?? "text"]
   const aiAvatar = settings.avatarAI || aiAvatarDefault
   const userAvatar = settings.avatarUser || "我"
@@ -90,7 +92,7 @@ export function CardPreview({ turns, themeId, platform, settings, title, minHeig
                   }
                   ${theme.textColor} ${theme.fontStyle}
                 `}
-                  style={{ fontSize: settings.fontSize + "px" }}
+                  style={{ fontSize: settings.fontSize + "px", fontFamily }}
                 >
                   {html ? (
                     <div

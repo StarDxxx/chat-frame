@@ -54,6 +54,7 @@ export type Translations = {
     chatApp: string
     exportPng: string
     typeSize: string
+    font: string
     showAvatars: string
     userLabel: string
     aiLabel: string
@@ -138,6 +139,7 @@ const en: Translations = {
     chatApp: "Chat app",
     exportPng: "Export PNG",
     typeSize: "Type size",
+    font: "Typeface",
     showAvatars: "Show avatars",
     userLabel: "User",
     aiLabel: "AI",
@@ -222,6 +224,7 @@ const zh: Translations = {
     chatApp: "聊天界面",
     exportPng: "导出 PNG",
     typeSize: "字号",
+    font: "字体",
     showAvatars: "显示头像",
     userLabel: "用户",
     aiLabel: "AI",
@@ -306,6 +309,7 @@ const ja: Translations = {
     chatApp: "チャット風",
     exportPng: "PNG 書き出し",
     typeSize: "文字サイズ",
+    font: "フォント",
     showAvatars: "アバター表示",
     userLabel: "ユーザー",
     aiLabel: "AI",

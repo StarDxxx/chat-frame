@@ -8,6 +8,7 @@ import { PreviewPanel } from "@/components/preview/PreviewPanel"
 import { SelectModal } from "@/components/dashboard/SelectModal"
 import { ImportBar } from "@/components/import/ImportBar"
 import { getPlaceholderForLocale } from "@/lib/placeholder"
+import { DEFAULT_FONT_ID } from "@/lib/fonts"
 import { getCardSize } from "@/lib/card-sizes"
 import { LocaleProvider, useLocale, type Locale } from "@/lib/i18n"
 import { TAGLINES } from "@/lib/i18n/taglines"
@@ -57,6 +58,7 @@ const INITIAL: PageState = {
     fontSize: 12,
     avatarUser: "我",
     avatarAI: "",
+    fontId: DEFAULT_FONT_ID["zh"],
   },
   selectModalOpen: false,
 }
@@ -128,7 +130,10 @@ function AppContent() {
 
   useEffect(() => {
     if (!state.isDemo) return
-    update(buildDemoState(locale))
+    update({
+      ...buildDemoState(locale),
+      settings: { ...state.settings, fontId: DEFAULT_FONT_ID[locale] },
+    })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale])
 
