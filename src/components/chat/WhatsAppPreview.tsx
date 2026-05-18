@@ -172,9 +172,10 @@ interface Props {
   turns: ConversationTurn[]
   platform?: PlatformId
   settings: CardSettings
+  minHeight?: number
 }
 
-export function WhatsAppPreview({ turns, settings }: Props) {
+export function WhatsAppPreview({ turns, settings, minHeight }: Props) {
   const fs = settings.fontSize || 14
   const aiLabel = settings.avatarAI || "AI"
 
@@ -186,6 +187,7 @@ export function WhatsAppPreview({ turns, settings }: Props) {
         fontFamily: "'SF Pro Text', 'Helvetica Neue', 'Segoe UI', sans-serif",
         borderRadius: 44,
         background: "#fff",
+        ...(minHeight ? { minHeight } : {}),
       }}
     >
       <StatusBar />
@@ -193,7 +195,7 @@ export function WhatsAppPreview({ turns, settings }: Props) {
 
       {/* 聊天区域 */}
       <div
-        className="relative"
+        className="flex-1 relative"
         style={{ background: CHAT_BG }}
       >
         <div

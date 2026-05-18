@@ -183,9 +183,10 @@ interface Props {
   turns: ConversationTurn[]
   platform?: PlatformId
   settings: CardSettings
+  minHeight?: number
 }
 
-export function WeChatPreview({ turns, settings }: Props) {
+export function WeChatPreview({ turns, settings, minHeight }: Props) {
   const fs = settings.fontSize || 14
   const avatarSize = getAvatarSize(fs)
   const aiLabel = settings.avatarAI || "AI"
@@ -200,13 +201,14 @@ export function WeChatPreview({ turns, settings }: Props) {
         fontFamily: "-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif",
         borderRadius: 36,
         background: TOP_BG,
+        ...(minHeight ? { minHeight } : {}),
       }}
     >
       <StatusBar />
       <NavBar aiLabel={aiLabel} />
 
       <div
-        className="relative"
+        className="flex-1 relative"
         style={{ background: CHAT_BG }}
       >
         <div

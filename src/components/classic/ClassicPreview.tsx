@@ -80,16 +80,17 @@ function DeepSeekIcon({ size = 20 }: { size?: number }) {
   )
 }
 
-function DeepSeekPreview({ turns, settings }: {
+function DeepSeekPreview({ turns, settings, minHeight }: {
   turns: ConversationTurn[]
   settings: CardSettings
+  minHeight?: number
 }) {
   const fs = settings.fontSize || 14
   const userAvatar = settings.avatarUser || "我"
   const aiAvatar = settings.avatarAI
 
   return (
-    <div id="card-export" className="relative w-full flex flex-col" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", borderRadius: 16, background: "#ffffff", color: "#111827" }}>
+    <div id="card-export" className="relative w-full flex flex-col" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", borderRadius: 16, background: "#ffffff", color: "#111827", ...(minHeight ? { minHeight } : {}) }}>
       <div style={{ height: 52, display: "flex", alignItems: "center", padding: "0 16px", gap: 10, flexShrink: 0 }}>
         <div style={{ color: "#3468ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <DeepSeekIcon />
@@ -99,7 +100,7 @@ function DeepSeekPreview({ turns, settings }: {
         </div>
       </div>
 
-      <div className="relative">
+      <div className="flex-1 relative">
         <div style={{ padding: "34px 24px 22px", display: "flex", flexDirection: "column", gap: 26 }}>
           {turns.map((turn) => {
             const isUser = turn.role === "user"
@@ -247,9 +248,10 @@ function ChatGPTInputBar() {
   )
 }
 
-function ChatGPTPreview({ turns, settings }: {
+function ChatGPTPreview({ turns, settings, minHeight }: {
   turns: ConversationTurn[]
   settings: CardSettings
+  minHeight?: number
 }) {
   const fs = settings.fontSize || 16
 
@@ -262,9 +264,10 @@ function ChatGPTPreview({ turns, settings }: {
         borderRadius: 16,
         background: "#ffffff",
         color: "#000",
+        ...(minHeight ? { minHeight } : {}),
       }}
     >
-      <div className="relative">
+      <div className="flex-1 relative">
         <div
           style={{
             padding: "54px 28px 120px",
@@ -374,9 +377,10 @@ function ClaudeInputBar() {
   )
 }
 
-function ClaudePreview({ turns, settings }: {
+function ClaudePreview({ turns, settings, minHeight }: {
   turns: ConversationTurn[]
   settings: CardSettings
+  minHeight?: number
 }) {
   const fs = settings.fontSize || 17
 
@@ -389,9 +393,10 @@ function ClaudePreview({ turns, settings }: {
         borderRadius: 16,
         background: "#fbfaf7",
         color: "#171512",
+        ...(minHeight ? { minHeight } : {}),
       }}
     >
-      <div className="relative">
+      <div className="flex-1 relative">
         <div
           style={{
             padding: "58px 28px 134px",
@@ -458,16 +463,17 @@ interface Props {
   turns: ConversationTurn[]
   platform?: PlatformId
   settings: CardSettings
+  minHeight?: number
 }
 
-export function ClassicPreview({ variant, turns, settings }: Props) {
+export function ClassicPreview({ variant, turns, settings, minHeight }: Props) {
   if (variant === "deepseek") {
-    return <DeepSeekPreview turns={turns} settings={settings} />
+    return <DeepSeekPreview turns={turns} settings={settings} minHeight={minHeight} />
   }
 
   if (variant === "chatgpt") {
-    return <ChatGPTPreview turns={turns} settings={settings} />
+    return <ChatGPTPreview turns={turns} settings={settings} minHeight={minHeight} />
   }
 
-  return <ClaudePreview turns={turns} settings={settings} />
+  return <ClaudePreview turns={turns} settings={settings} minHeight={minHeight} />
 }

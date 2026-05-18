@@ -82,6 +82,9 @@ export function PreviewPanel({
   const [classicVariant, setClassicVariant] = useState<ClassicVariant>("claude")
 
   const size = getCardSize(settings.sizeId)
+  const [rw, rh] = size.ratio.split("/").map(Number)
+  // Card wrapper has p-2 (8px each side), so inner card width = previewWidth - 16
+  const minHeight = Math.round((size.previewWidth - 16) * rh / rw)
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -92,18 +95,19 @@ export function PreviewPanel({
         >
           {themeCategory === "chat-app" ? (
             chatVariant === "wechat"
-              ? <WeChatPreview turns={turns} platform={platform} settings={settings} />
+              ? <WeChatPreview turns={turns} platform={platform} settings={settings} minHeight={minHeight} />
               : chatVariant === "whatsapp"
-                ? <WhatsAppPreview turns={turns} platform={platform} settings={settings} />
-                : <MemoPreview turns={turns} platform={platform} settings={settings} />
+                ? <WhatsAppPreview turns={turns} platform={platform} settings={settings} minHeight={minHeight} />
+                : <MemoPreview turns={turns} platform={platform} settings={settings} minHeight={minHeight} />
           ) : themeCategory === "classic" ? (
-            <ClassicPreview variant={classicVariant} turns={turns} platform={platform} settings={settings} />
+            <ClassicPreview variant={classicVariant} turns={turns} platform={platform} settings={settings} minHeight={minHeight} />
           ) : (
             <CardPreview
               turns={turns}
               themeId={themeId}
               platform={platform}
               settings={settings}
+              minHeight={minHeight}
             />
           )}
         </div>

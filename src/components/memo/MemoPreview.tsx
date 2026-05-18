@@ -240,9 +240,10 @@ interface Props {
   turns: ConversationTurn[]
   platform?: PlatformId
   settings: CardSettings
+  minHeight?: number
 }
 
-export function MemoPreview({ turns, settings }: Props) {
+export function MemoPreview({ turns, settings, minHeight }: Props) {
   const fs = settings.fontSize || 17
   const aiLabel = settings.avatarAI || "机器人"
 
@@ -255,12 +256,13 @@ export function MemoPreview({ turns, settings }: Props) {
         borderRadius: 42,
         background: "#FFFFFF",
         color: TEXT,
+        ...(minHeight ? { minHeight } : {}),
       }}
     >
       <StatusBar />
       <NavBar aiLabel={aiLabel} />
 
-      <div className="relative">
+      <div className="flex-1 relative">
         <div
           style={{
             padding: "2px 21px 20px",

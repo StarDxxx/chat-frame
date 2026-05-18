@@ -21,9 +21,10 @@ interface Props {
   platform?: PlatformId
   settings: CardSettings
   title?: string
+  minHeight?: number
 }
 
-export function CardPreview({ turns, themeId, platform, settings, title }: Props) {
+export function CardPreview({ turns, themeId, platform, settings, title, minHeight }: Props) {
   const aiAvatarDefault = PLATFORM_AVATAR[platform ?? "text"]
   const aiAvatar = settings.avatarAI || aiAvatarDefault
   const userAvatar = settings.avatarUser || "我"
@@ -32,13 +33,17 @@ export function CardPreview({ turns, themeId, platform, settings, title }: Props
   return (
     <div
       id="card-export"
-      className={`relative w-full rounded-3xl bg-gradient-to-br ${theme.gradient}`}
+      className={`relative w-full rounded-3xl flex flex-col bg-gradient-to-br ${theme.gradient}`}
+      style={minHeight ? { minHeight } : undefined}
     >
       {/* Noise texture */}
       <div
         className="absolute inset-0 opacity-20 pointer-events-none rounded-3xl"
         style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E\")" }}
       />
+
+      {/* Spacer: pushes content to the bottom when card is at min-height */}
+      <div className="flex-1" />
 
       <div className="relative w-full p-5 flex flex-col gap-3">
         {title && (
