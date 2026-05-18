@@ -80,19 +80,16 @@ function DeepSeekIcon({ size = 20 }: { size?: number }) {
   )
 }
 
-function DeepSeekPreview({ turns, settings, pageOffset, pageViewportHeight }: {
+function DeepSeekPreview({ turns, settings }: {
   turns: ConversationTurn[]
   settings: CardSettings
-  pageOffset?: number
-  pageViewportHeight?: number
 }) {
-  const paginated = pageOffset !== undefined
   const fs = settings.fontSize || 14
   const userAvatar = settings.avatarUser || "我"
   const aiAvatar = settings.avatarAI
 
   return (
-    <div id="card-export" className="relative w-full h-full overflow-hidden flex flex-col" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", borderRadius: 16, background: "#ffffff", color: "#111827" }}>
+    <div id="card-export" className="relative w-full flex flex-col" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", borderRadius: 16, background: "#ffffff", color: "#111827" }}>
       <div style={{ height: 52, display: "flex", alignItems: "center", padding: "0 16px", gap: 10, flexShrink: 0 }}>
         <div style={{ color: "#3468ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <DeepSeekIcon />
@@ -102,8 +99,8 @@ function DeepSeekPreview({ turns, settings, pageOffset, pageViewportHeight }: {
         </div>
       </div>
 
-      <div className="flex-1 relative overflow-hidden" style={pageViewportHeight ? { height: pageViewportHeight, flex: "none" } : {}}>
-        <div style={{ minHeight: "100%", padding: "34px 24px 22px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 26, ...(paginated ? { transform: `translateY(-${pageOffset}px)` } : {}) }}>
+      <div className="relative">
+        <div style={{ padding: "34px 24px 22px", display: "flex", flexDirection: "column", gap: 26 }}>
           {turns.map((turn) => {
             const isUser = turn.role === "user"
 
@@ -250,19 +247,16 @@ function ChatGPTInputBar() {
   )
 }
 
-function ChatGPTPreview({ turns, settings, pageOffset, pageViewportHeight }: {
+function ChatGPTPreview({ turns, settings }: {
   turns: ConversationTurn[]
   settings: CardSettings
-  pageOffset?: number
-  pageViewportHeight?: number
 }) {
-  const paginated = pageOffset !== undefined
   const fs = settings.fontSize || 16
 
   return (
     <div
       id="card-export"
-      className="relative w-full h-full overflow-hidden flex flex-col"
+      className="relative w-full flex flex-col"
       style={{
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif",
         borderRadius: 16,
@@ -270,15 +264,13 @@ function ChatGPTPreview({ turns, settings, pageOffset, pageViewportHeight }: {
         color: "#000",
       }}
     >
-      <div className="flex-1 relative overflow-hidden" style={pageViewportHeight ? { height: pageViewportHeight, flex: "none" } : {}}>
+      <div className="relative">
         <div
           style={{
-            minHeight: "100%",
             padding: "54px 28px 120px",
             display: "flex",
             flexDirection: "column",
             gap: 48,
-            ...(paginated ? { transform: `translateY(-${pageOffset}px)` } : {}),
           }}
         >
           {turns.map((turn) => {
@@ -382,19 +374,16 @@ function ClaudeInputBar() {
   )
 }
 
-function ClaudePreview({ turns, settings, pageOffset, pageViewportHeight }: {
+function ClaudePreview({ turns, settings }: {
   turns: ConversationTurn[]
   settings: CardSettings
-  pageOffset?: number
-  pageViewportHeight?: number
 }) {
-  const paginated = pageOffset !== undefined
   const fs = settings.fontSize || 17
 
   return (
     <div
       id="card-export"
-      className="relative w-full h-full overflow-hidden flex flex-col"
+      className="relative w-full flex flex-col"
       style={{
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
         borderRadius: 16,
@@ -402,15 +391,13 @@ function ClaudePreview({ turns, settings, pageOffset, pageViewportHeight }: {
         color: "#171512",
       }}
     >
-      <div className="flex-1 relative overflow-hidden" style={pageViewportHeight ? { height: pageViewportHeight, flex: "none" } : {}}>
+      <div className="relative">
         <div
           style={{
-            minHeight: "100%",
             padding: "58px 28px 134px",
             display: "flex",
             flexDirection: "column",
             gap: 30,
-            ...(paginated ? { transform: `translateY(-${pageOffset}px)` } : {}),
           }}
         >
           {turns.map((turn) => {
@@ -471,18 +458,16 @@ interface Props {
   turns: ConversationTurn[]
   platform?: PlatformId
   settings: CardSettings
-  pageOffset?: number
-  pageViewportHeight?: number
 }
 
-export function ClassicPreview({ variant, turns, settings, pageOffset, pageViewportHeight }: Props) {
+export function ClassicPreview({ variant, turns, settings }: Props) {
   if (variant === "deepseek") {
-    return <DeepSeekPreview turns={turns} settings={settings} pageOffset={pageOffset} pageViewportHeight={pageViewportHeight} />
+    return <DeepSeekPreview turns={turns} settings={settings} />
   }
 
   if (variant === "chatgpt") {
-    return <ChatGPTPreview turns={turns} settings={settings} pageOffset={pageOffset} pageViewportHeight={pageViewportHeight} />
+    return <ChatGPTPreview turns={turns} settings={settings} />
   }
 
-  return <ClaudePreview turns={turns} settings={settings} pageOffset={pageOffset} pageViewportHeight={pageViewportHeight} />
+  return <ClaudePreview turns={turns} settings={settings} />
 }

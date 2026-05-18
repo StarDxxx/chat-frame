@@ -240,19 +240,16 @@ interface Props {
   turns: ConversationTurn[]
   platform?: PlatformId
   settings: CardSettings
-  pageOffset?: number
-  pageViewportHeight?: number
 }
 
-export function MemoPreview({ turns, settings, pageOffset, pageViewportHeight }: Props) {
-  const paginated = pageOffset !== undefined
+export function MemoPreview({ turns, settings }: Props) {
   const fs = settings.fontSize || 17
   const aiLabel = settings.avatarAI || "机器人"
 
   return (
     <div
       id="card-export"
-      className="relative w-full h-full overflow-hidden flex flex-col"
+      className="relative w-full flex flex-col"
       style={{
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Helvetica Neue', sans-serif",
         borderRadius: 42,
@@ -263,17 +260,13 @@ export function MemoPreview({ turns, settings, pageOffset, pageViewportHeight }:
       <StatusBar />
       <NavBar aiLabel={aiLabel} />
 
-      <div
-        className="flex-1 relative overflow-hidden"
-        style={pageViewportHeight ? { height: pageViewportHeight, flex: "none" } : {}}
-      >
+      <div className="relative">
         <div
           style={{
             padding: "2px 21px 20px",
             display: "flex",
             flexDirection: "column",
             gap: 15,
-            ...(paginated ? { transform: `translateY(-${pageOffset}px)` } : {}),
           }}
         >
           {turns.map((turn) => {

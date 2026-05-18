@@ -183,12 +183,9 @@ interface Props {
   turns: ConversationTurn[]
   platform?: PlatformId
   settings: CardSettings
-  pageOffset?: number
-  pageViewportHeight?: number
 }
 
-export function WeChatPreview({ turns, settings, pageOffset, pageViewportHeight }: Props) {
-  const paginated = pageOffset !== undefined
+export function WeChatPreview({ turns, settings }: Props) {
   const fs = settings.fontSize || 14
   const avatarSize = getAvatarSize(fs)
   const aiLabel = settings.avatarAI || "AI"
@@ -198,7 +195,7 @@ export function WeChatPreview({ turns, settings, pageOffset, pageViewportHeight 
   return (
     <div
       id="card-export"
-      className="relative w-full h-full overflow-hidden flex flex-col"
+      className="relative w-full flex flex-col"
       style={{
         fontFamily: "-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif",
         borderRadius: 36,
@@ -209,8 +206,8 @@ export function WeChatPreview({ turns, settings, pageOffset, pageViewportHeight 
       <NavBar aiLabel={aiLabel} />
 
       <div
-        className="flex-1 relative overflow-hidden"
-        style={{ background: CHAT_BG, ...(pageViewportHeight ? { height: pageViewportHeight, flex: "none" } : {}) }}
+        className="relative"
+        style={{ background: CHAT_BG }}
       >
         <div
           style={{
@@ -218,7 +215,6 @@ export function WeChatPreview({ turns, settings, pageOffset, pageViewportHeight 
             display: "flex",
             flexDirection: "column",
             gap: 18,
-            ...(paginated ? { transform: `translateY(-${pageOffset}px)` } : {}),
           }}
         >
           {turns.map((turn) => {

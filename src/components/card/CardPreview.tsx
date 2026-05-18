@@ -21,47 +21,33 @@ interface Props {
   platform?: PlatformId
   settings: CardSettings
   title?: string
-  pageOffset?: number        // px to shift content up for multi-page view
-  pageViewportHeight?: number // constrain viewport height to match offset increment
 }
 
-export function CardPreview({ turns, themeId, platform, settings, title, pageOffset, pageViewportHeight }: Props) {
+export function CardPreview({ turns, themeId, platform, settings, title }: Props) {
   const aiAvatarDefault = PLATFORM_AVATAR[platform ?? "text"]
   const aiAvatar = settings.avatarAI || aiAvatarDefault
   const userAvatar = settings.avatarUser || "我"
   const theme = getTheme(themeId)
-  const paginated = pageOffset !== undefined
-  // bottom-up only applies to single-page cards; paginated cards always scroll top-down
-  const bottomUp = !paginated && settings.layoutFlow === "bottom-up"
 
   return (
     <div
       id="card-export"
-      className={`relative w-full h-full rounded-3xl overflow-hidden bg-gradient-to-br ${theme.gradient}`}
+      className={`relative w-full rounded-3xl bg-gradient-to-br ${theme.gradient}`}
     >
       {/* Noise texture */}
       <div
-        className="absolute inset-0 opacity-20 pointer-events-none"
+        className="absolute inset-0 opacity-20 pointer-events-none rounded-3xl"
         style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E\")" }}
       />
 
-      <div className="relative w-full h-full p-5 flex flex-col gap-3">
+      <div className="relative w-full p-5 flex flex-col gap-3">
         {title && (
-          <p className={`text-[10px] font-semibold uppercase tracking-widest ${theme.accentColor} opacity-70 shrink-0`}>
+          <p className={`text-[10px] font-semibold uppercase tracking-widest ${theme.accentColor} opacity-70`}>
             {title}
           </p>
         )}
 
-        {/* Viewport: clips content. Height is clamped to pageViewportHeight when paginating
-            so that offset increment == viewport height, eliminating any cross-page overlap. */}
-        <div
-          className={`overflow-hidden ${pageViewportHeight ? "shrink-0" : "flex-1"}`}
-          style={pageViewportHeight ? { height: pageViewportHeight } : undefined}
-        >
-          <div
-            className={`flex flex-col gap-2.5 ${bottomUp ? "justify-end h-full" : ""}`}
-            style={paginated ? { transform: `translateY(-${pageOffset}px)` } : undefined}
-          >
+        <div className="flex flex-col gap-2.5">
           {turns.map((turn) => {
             const isUser = turn.role === "user"
             const html = isHtml(turn.content)
@@ -101,11 +87,10 @@ export function CardPreview({ turns, themeId, platform, settings, title, pageOff
               </div>
             )
           })}
-          </div>
         </div>
 
         {settings.showFooter && (
-          <div className="shrink-0 pt-1 flex items-center justify-between">
+          <div className="pt-1 flex items-center justify-between">
             <span className={`text-[9px] ${theme.accentColor} opacity-50`}>AI 对话卡片</span>
             <span className={`text-[9px] ${theme.accentColor} opacity-50`}>{theme.label}</span>
           </div>

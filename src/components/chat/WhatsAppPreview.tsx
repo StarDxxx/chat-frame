@@ -172,19 +172,16 @@ interface Props {
   turns: ConversationTurn[]
   platform?: PlatformId
   settings: CardSettings
-  pageOffset?: number
-  pageViewportHeight?: number
 }
 
-export function WhatsAppPreview({ turns, settings, pageOffset, pageViewportHeight }: Props) {
-  const paginated = pageOffset !== undefined
+export function WhatsAppPreview({ turns, settings }: Props) {
   const fs = settings.fontSize || 14
   const aiLabel = settings.avatarAI || "AI"
 
   return (
     <div
       id="card-export"
-      className="relative w-full h-full overflow-hidden flex flex-col"
+      className="relative w-full flex flex-col"
       style={{
         fontFamily: "'SF Pro Text', 'Helvetica Neue', 'Segoe UI', sans-serif",
         borderRadius: 44,
@@ -196,8 +193,8 @@ export function WhatsAppPreview({ turns, settings, pageOffset, pageViewportHeigh
 
       {/* 聊天区域 */}
       <div
-        className="flex-1 relative overflow-hidden"
-        style={{ background: CHAT_BG, ...(pageViewportHeight ? { height: pageViewportHeight, flex: "none" } : {}) }}
+        className="relative"
+        style={{ background: CHAT_BG }}
       >
         <div
           style={{
@@ -205,7 +202,6 @@ export function WhatsAppPreview({ turns, settings, pageOffset, pageViewportHeigh
             display: "flex",
             flexDirection: "column",
             gap: 4,
-            ...(paginated ? { transform: `translateY(-${pageOffset}px)` } : {}),
           }}
         >
           {turns.map((turn) => {

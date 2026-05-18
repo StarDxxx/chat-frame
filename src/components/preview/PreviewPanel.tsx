@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
-import { ChevronLeft, ChevronRight, ImageDown, Settings2, Type } from "lucide-react"
+import { useState } from "react"
+import { ImageDown, Settings2, Type } from "lucide-react"
 import { CardPreview } from "@/components/card/CardPreview"
 import { MemoPreview } from "@/components/memo/MemoPreview"
 import { WeChatPreview } from "@/components/chat/WeChatPreview"
@@ -31,8 +31,6 @@ const THEME_CATEGORIES: { id: ThemeCategoryId; label: string }[] = [
   { id: "chat-app", label: "Chat app" },
   { id: "classic", label: "Native AI" },
 ]
-
-const CHAT_APP_ASPECT_RATIO = "440/956"
 
 interface Props {
   turns: ConversationTurn[]
@@ -67,10 +65,6 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
   )
 }
 
-function isHtml(content: string) {
-  return content.trimStart().startsWith("<")
-}
-
 export function PreviewPanel({
   turns,
   themeCategory,
@@ -86,93 +80,15 @@ export function PreviewPanel({
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [chatVariant, setChatVariant] = useState<ChatVariant>("imessage")
   const [classicVariant, setClassicVariant] = useState<ClassicVariant>("claude")
-  const [currentPage, setCurrentPage] = useState(0)
-  const [pageOffsets, setPageOffsets] = useState<number[]>([0])
-  const [rawAvail, setRawAvail] = useState(0)
-  const [cardDims, setCardDims] = useState({ w: 0, h: 0 })
-
-  const cardWrapperRef = useRef<HTMLDivElement>(null)
-  const rulerRef = useRef<HTMLDivElement>(null)
 
   const size = getCardSize(settings.sizeId)
-  const aspectRatio = themeCategory === "chat-app" ? CHAT_APP_ASPECT_RATIO : size.ratio
-
-  useEffect(() => {
-    const el = cardWrapperRef.current
-    if (!el) return
-    const obs = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect
-      setCardDims({ w: Math.round(width), h: Math.round(height) })
-    })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-
-  useLayoutEffect(() => {
-    if (!rulerRef.current || cardDims.h === 0 || themeCategory !== "card") return
-    const rulerEl = rulerRef.current
-    const children = Array.from(rulerEl.children)
-    if (children.length !== turns.length || children.length === 0) {
-      setPageOffsets([0])
-      return
-    }
-
-    const rulerTop = rulerEl.getBoundingClientRect().top
-    const lastChild = children[children.length - 1] as HTMLElement
-    const totalH = lastChild.getBoundingClientRect().bottom - rulerTop
-    const paddingV = 48
-    const footerH = settings.showFooter ? 38 : 0
-    const avail = Math.max(1, cardDims.h - paddingV - footerH)
-    const lineH = settings.fontSize * 1.625
-    const bubblePad = 12
-
-    const safeCuts: number[] = []
-    for (const child of children) {
-      const turnEl = child as HTMLElement
-      const bubbleEl = turnEl.children[turnEl.children.length - 1] as HTMLElement
-      if (!bubbleEl) continue
-      const r = bubbleEl.getBoundingClientRect()
-      const top = r.top - rulerTop
-      const bottom = r.bottom - rulerTop
-      for (let y = top + bubblePad + lineH; y <= bottom - bubblePad + 0.5; y += lineH) {
-        safeCuts.push(y)
-      }
-      safeCuts.push(bottom)
-    }
-    safeCuts.sort((a, b) => a - b)
-
-    const offsets: number[] = [0]
-    let pos = 0
-    while (pos < totalH - 1) {
-      const target = pos + avail
-      if (target >= totalH) break
-      const candidates = safeCuts.filter((y) => y > pos && y <= target)
-      const next = candidates.length > 0 ? Math.max(...candidates) : target
-      if (next <= pos) break
-      offsets.push(next)
-      pos = next
-    }
-
-    setPageOffsets(offsets)
-    setRawAvail(avail)
-    setCurrentPage((prev) => Math.min(prev, offsets.length - 1))
-  }, [turns, cardDims.w, cardDims.h, settings.fontSize, settings.showFooter, settings.showAvatars, themeCategory])
-
-  const totalPages = pageOffsets.length
-  const currentOffset = pageOffsets[currentPage] ?? 0
-  const nextOffset = pageOffsets[currentPage + 1]
-  const currentViewportH = nextOffset !== undefined ? nextOffset - currentOffset : rawAvail
-  const pageOffset = totalPages > 1 ? currentOffset : undefined
-  const pageViewportH = totalPages > 1 ? currentViewportH : undefined
-  const rulerWidth = cardDims.w > 0 ? cardDims.w - 48 : 240
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 overflow-hidden bg-[var(--paper)] p-6">
+      <div className="flex min-h-0 flex-1 flex-col items-center gap-4 overflow-y-auto bg-[var(--paper)] p-6">
         <div
-          ref={cardWrapperRef}
-          className="max-h-full max-w-full border-2 border-foreground bg-background p-2 ink-shadow"
-          style={{ aspectRatio }}
+          className="border-2 border-foreground bg-background p-2 ink-shadow"
+          style={{ width: size.previewWidth }}
         >
           {themeCategory === "chat-app" ? (
             chatVariant === "wechat"
@@ -188,65 +104,9 @@ export function PreviewPanel({
               themeId={themeId}
               platform={platform}
               settings={settings}
-              pageOffset={pageOffset}
-              pageViewportHeight={pageViewportH}
             />
           )}
         </div>
-
-        {themeCategory === "card" && pageOffsets.length > 1 && (
-          <div className="flex items-center gap-2 border-2 border-foreground bg-[var(--paper-soft)] p-1 ink-shadow">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-              disabled={currentPage === 0}
-              className="grid h-7 w-7 place-items-center hover:bg-foreground hover:text-background disabled:opacity-25"
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <div className="flex items-center gap-1 px-1">
-              {pageOffsets.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(i)}
-                  className={`h-2 border border-foreground transition-all ${
-                    i === currentPage ? "w-5 bg-[var(--proof)]" : "w-2 bg-background"
-                  }`}
-                  aria-label={`Go to page ${i + 1}`}
-                />
-              ))}
-            </div>
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(pageOffsets.length - 1, p + 1))}
-              disabled={currentPage === pageOffsets.length - 1}
-              className="grid h-7 w-7 place-items-center hover:bg-foreground hover:text-background disabled:opacity-25"
-              aria-label="Next page"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        )}
-      </div>
-
-      <div
-        ref={rulerRef}
-        className="fixed pointer-events-none overflow-visible opacity-0"
-        style={{ left: -9999, top: 0, width: rulerWidth, fontSize: settings.fontSize + "px" }}
-      >
-        {turns.map((turn) => {
-          const user = turn.role === "user"
-          return (
-            <div key={turn.id} className={`flex items-end gap-2 ${user ? "flex-row-reverse" : ""}`}>
-              {settings.showAvatars && <div className="h-6 w-6 shrink-0" />}
-              <div className="max-w-[78%] border-2 px-3 py-2" style={{ lineHeight: "1.625" }}>
-                {isHtml(turn.content)
-                  ? <div className="prose-card" dangerouslySetInnerHTML={{ __html: turn.content }} />
-                  : <p className="whitespace-pre-wrap">{turn.content}</p>
-                }
-              </div>
-            </div>
-          )
-        })}
       </div>
 
       <div className="shrink-0 space-y-2 border-t-2 border-foreground bg-[var(--paper-soft)] p-3">
@@ -283,37 +143,20 @@ export function PreviewPanel({
         )}
 
         {themeCategory === "card" && (
-          <>
-            <div className="flex gap-2 overflow-x-auto pb-0.5">
-              {THEMES.map((theme) => (
-                <button
-                  key={theme.id}
-                  onClick={() => onThemeChange(theme.id as EmotionThemeId)}
-                  className={`flex shrink-0 items-center gap-2 border border-foreground px-2 py-1 text-xs font-bold uppercase ${
-                    themeId === theme.id ? "bg-[var(--accent)]" : "bg-background hover:bg-muted"
-                  }`}
-                >
-                  <span className={`h-4 w-4 border border-foreground bg-gradient-to-br ${theme.gradient}`} />
-                  {theme.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex gap-1.5 overflow-x-auto pb-0.5">
-              {CARD_SIZES.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => onSizeChange(s.id)}
-                  title={`${s.exportWidth} x ${s.exportHeight}`}
-                  className={`shrink-0 border border-foreground px-3 py-1 text-xs font-bold uppercase ${
-                    settings.sizeId === s.id ? "bg-foreground text-background" : "bg-background hover:bg-muted"
-                  }`}
-                >
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          </>
+          <div className="flex gap-2 overflow-x-auto pb-0.5">
+            {THEMES.map((theme) => (
+              <button
+                key={theme.id}
+                onClick={() => onThemeChange(theme.id as EmotionThemeId)}
+                className={`flex shrink-0 items-center gap-2 border border-foreground px-2 py-1 text-xs font-bold uppercase ${
+                  themeId === theme.id ? "bg-[var(--accent)]" : "bg-background hover:bg-muted"
+                }`}
+              >
+                <span className={`h-4 w-4 border border-foreground bg-gradient-to-br ${theme.gradient}`} />
+                {theme.label}
+              </button>
+            ))}
+          </div>
         )}
 
         {themeCategory === "classic" && (
@@ -331,6 +174,22 @@ export function PreviewPanel({
             ))}
           </div>
         )}
+
+        {/* Width selector — always visible */}
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+          {CARD_SIZES.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => onSizeChange(s.id)}
+              title={`预览宽度 ${s.previewWidth}px`}
+              className={`shrink-0 border border-foreground px-3 py-1 text-xs font-bold uppercase ${
+                settings.sizeId === s.id ? "bg-foreground text-background" : "bg-background hover:bg-muted"
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
 
         <div className="flex items-center gap-2">
           <div className="relative">
@@ -369,11 +228,6 @@ export function PreviewPanel({
                     </div>
                   </div>
 
-                  <Toggle
-                    label="Top-down flow"
-                    checked={settings.layoutFlow === "top-down"}
-                    onChange={(v) => onSettingsChange({ layoutFlow: v ? "top-down" : "bottom-up" })}
-                  />
                   <Toggle
                     label="Show avatars"
                     checked={settings.showAvatars}
