@@ -28,8 +28,8 @@ const CLASSIC_VARIANTS: { id: ClassicVariant; label: string }[] = [
 
 const THEME_CATEGORIES: { id: ThemeCategoryId; label: string }[] = [
   { id: "card", label: "Editorial card" },
-  { id: "chat-app", label: "Chat app" },
   { id: "classic", label: "Native AI" },
+  { id: "chat-app", label: "Chat app" },
 ]
 
 interface Props {

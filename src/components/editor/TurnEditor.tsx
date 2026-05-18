@@ -94,42 +94,43 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
 
   if (!editor) return null
 
+  // avatar w-8 (32px) + gap-3 (12px) = 44px = pl/pr-11
+  const bubbleOffset = isUser ? "pr-11" : "pl-11"
+
   return (
-    <div
-      ref={containerRef}
-      className={`relative flex items-end gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}
-    >
-      {hasSelection && toolbarPos && (
-        <div
-          className="absolute z-30 flex items-center gap-1 border-2 border-foreground bg-[var(--paper)] p-1 ink-shadow"
-          style={{ top: toolbarPos.top, left: toolbarPos.left }}
-        >
-          <ToolbarBtn label="Bold" onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
-            <Bold className="h-3.5 w-3.5" />
-          </ToolbarBtn>
-          <ToolbarBtn label="Italic" onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
-            <Italic className="h-3.5 w-3.5" />
-          </ToolbarBtn>
-          <ToolbarBtn label="Underline" onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")}>
-            <UnderlineIcon className="h-3.5 w-3.5" />
-          </ToolbarBtn>
-          <ToolbarBtn label="Blur sensitive text" onClick={() => editor.chain().focus().toggleMark("blur").run()} active={editor.isActive("blur")}>
-            <EyeOff className="h-3.5 w-3.5" />
-          </ToolbarBtn>
-          <ToolbarBtn label="Delete selection" onClick={() => editor.chain().focus().deleteSelection().run()}>
-            <Trash2 className="h-3.5 w-3.5" />
-          </ToolbarBtn>
+    <div ref={containerRef} className="group relative">
+      {/* Row: avatar + bubble, items-end so avatar bottom aligns with bubble bottom */}
+      <div className={`relative flex items-end gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
+        {hasSelection && toolbarPos && (
+          <div
+            className="absolute z-30 flex items-center gap-1 border-2 border-foreground bg-[var(--paper)] p-1 ink-shadow"
+            style={{ top: toolbarPos.top, left: toolbarPos.left }}
+          >
+            <ToolbarBtn label="Bold" onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
+              <Bold className="h-3.5 w-3.5" />
+            </ToolbarBtn>
+            <ToolbarBtn label="Italic" onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
+              <Italic className="h-3.5 w-3.5" />
+            </ToolbarBtn>
+            <ToolbarBtn label="Underline" onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")}>
+              <UnderlineIcon className="h-3.5 w-3.5" />
+            </ToolbarBtn>
+            <ToolbarBtn label="Blur sensitive text" onClick={() => editor.chain().focus().toggleMark("blur").run()} active={editor.isActive("blur")}>
+              <EyeOff className="h-3.5 w-3.5" />
+            </ToolbarBtn>
+            <ToolbarBtn label="Delete selection" onClick={() => editor.chain().focus().deleteSelection().run()}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </ToolbarBtn>
+          </div>
+        )}
+
+        <div className={`mb-1 grid h-8 w-8 shrink-0 place-items-center border-2 border-foreground text-[10px] font-black ${
+          isUser ? "bg-[var(--accent)]" : "bg-foreground text-background"
+        }`}>
+          {avatarLabel}
         </div>
-      )}
 
-      <div className={`mb-1 grid h-8 w-8 shrink-0 place-items-center border-2 border-foreground text-[10px] font-black ${
-        isUser ? "bg-[var(--accent)]" : "bg-foreground text-background"
-      }`}>
-        {avatarLabel}
-      </div>
-
-      <div className={`group flex max-w-[82%] flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
-        <div className={`relative border-2 border-foreground px-4 py-3 ${
+        <div className={`relative max-w-[82%] border-2 border-foreground px-4 py-3 ${
           isUser
             ? "bg-[var(--accent)] proof-shadow"
             : "bg-[var(--paper-soft)] ink-shadow"
@@ -139,7 +140,10 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
           </div>
           <EditorContent editor={editor} />
         </div>
+      </div>
 
+      {/* Remove button sits below the bubble, offset to skip the avatar column */}
+      <div className={`mt-1 flex ${isUser ? "justify-end " + bubbleOffset : "justify-start " + bubbleOffset}`}>
         <button
           onClick={onDelete}
           className="opacity-0 transition-opacity text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground hover:text-[var(--proof)] group-hover:opacity-100"
