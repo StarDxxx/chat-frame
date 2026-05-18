@@ -7,7 +7,7 @@ import { ConversationEditor } from "@/components/editor/ConversationEditor"
 import { PreviewPanel } from "@/components/preview/PreviewPanel"
 import { SelectModal } from "@/components/dashboard/SelectModal"
 import { ImportBar } from "@/components/import/ImportBar"
-import { PLACEHOLDER_CONVERSATION, PLACEHOLDER_SELECTED_IDS } from "@/lib/placeholder"
+import { getPlaceholderForLocale } from "@/lib/placeholder"
 import { getCardSize } from "@/lib/card-sizes"
 import { LocaleProvider, useLocale, type Locale } from "@/lib/i18n"
 import { TAGLINES } from "@/lib/i18n/taglines"
@@ -25,16 +25,27 @@ interface PageState {
   selectModalOpen: boolean
 }
 
-const initialSelectedTurns = PLACEHOLDER_CONVERSATION.turns.filter((t) =>
-  PLACEHOLDER_SELECTED_IDS.includes(t.id)
-)
+function buildDemoState(locale: Locale): Partial<PageState> {
+  const { conversation, selectedIds } = getPlaceholderForLocale(locale)
+  const selected = conversation.turns.filter((t) => selectedIds.includes(t.id))
+  return {
+    isDemo: true,
+    conversation,
+    selectedTurnIds: selectedIds,
+    selectedTurns: selected,
+    editedTurns: selected,
+  }
+}
+
+const { conversation: initConv, selectedIds: initIds } = getPlaceholderForLocale("zh")
+const initSelected = initConv.turns.filter((t) => initIds.includes(t.id))
 
 const INITIAL: PageState = {
   isDemo: true,
-  conversation: PLACEHOLDER_CONVERSATION,
-  selectedTurnIds: PLACEHOLDER_SELECTED_IDS,
-  selectedTurns: initialSelectedTurns,
-  editedTurns: initialSelectedTurns,
+  conversation: initConv,
+  selectedTurnIds: initIds,
+  selectedTurns: initSelected,
+  editedTurns: initSelected,
   themeCategory: "card",
   selectedTheme: "graphite",
   settings: {
@@ -114,6 +125,12 @@ function AppContent() {
 
   const update = (patch: Partial<PageState>) =>
     setState((prev) => ({ ...prev, ...patch }))
+
+  useEffect(() => {
+    if (!state.isDemo) return
+    update(buildDemoState(locale))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale])
 
   const handleImport = (conversation: Conversation) => {
     const selectedIds = conversation.turns.map((t) => t.id)

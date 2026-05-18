@@ -132,14 +132,11 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
           {avatarLabel}
         </div>
 
-        <div className={`relative max-w-[82%] border-2 border-foreground px-4 py-3 ${
+        <div className={`relative max-w-[82%] border-2 border-foreground px-3 py-2 ${
           isUser
             ? "bg-[var(--accent)] proof-shadow"
             : "bg-[var(--paper-soft)] ink-shadow"
         }`}>
-          <div className="mb-2 flex items-center gap-2 border-b border-foreground/35 pb-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted-foreground">
-            <span>{isUser ? t("editor.sourceNote") : t("editor.aiResponse")}</span>
-          </div>
           <EditorContent editor={editor} />
         </div>
       </div>

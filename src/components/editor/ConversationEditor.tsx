@@ -75,7 +75,7 @@ export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI,
   }
 
   return (
-    <div className="flex flex-col gap-4 p-6">
+    <div className="flex flex-col gap-2 p-4">
       {isDemo && (
         <div className="mx-auto border border-foreground bg-[var(--accent)] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
           {t("editor.sampleBanner")}
@@ -87,7 +87,7 @@ export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI,
             key={turn.id}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97 }}
+            exit={{ opacity: 0, transition: { duration: 0 } }}
             transition={{ duration: 0.22, delay: i * 0.04, ease: "easeOut" }}
           >
             <TurnEditor
