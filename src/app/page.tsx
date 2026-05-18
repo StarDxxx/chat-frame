@@ -75,20 +75,18 @@ function RotatingTagline() {
   }, [shuffled])
 
   return (
-    <div className="relative h-[14px] overflow-hidden">
-      <AnimatePresence mode="wait">
-        <motion.p
-          key={`${locale}-${idx}`}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.35, ease: "easeInOut" }}
-          className="absolute inset-0 text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground whitespace-nowrap"
-        >
-          {shuffled[idx]}
-        </motion.p>
-      </AnimatePresence>
-    </div>
+    <AnimatePresence mode="wait">
+      <motion.p
+        key={`${locale}-${idx}`}
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground"
+      >
+        {shuffled[idx]}
+      </motion.p>
+    </AnimatePresence>
   )
 }
 
