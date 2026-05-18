@@ -5,6 +5,7 @@ import { Check, X } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { MarkdownRenderer } from "@/components/MarkdownRenderer"
 import type { Conversation } from "@/lib/types"
+import { useLocale } from "@/lib/i18n"
 
 interface Props {
   conversation: Conversation
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function SelectModal({ conversation, selectedIds, onSelect, onClose }: Props) {
+  const { t } = useLocale()
   const [local, setLocal] = useState<string[]>(selectedIds)
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 
@@ -34,9 +36,9 @@ export function SelectModal({ conversation, selectedIds, onSelect, onClose }: Pr
       <div className="newsprint-panel relative mx-4 flex max-h-[82vh] w-full max-w-2xl flex-col overflow-hidden">
         <div className="flex shrink-0 items-start justify-between gap-4 border-b-2 border-foreground bg-[var(--paper)] px-5 py-4">
           <div>
-            <h3 className="font-editorial text-2xl font-black leading-none">Select the Clippings</h3>
+            <h3 className="font-editorial text-2xl font-black leading-none">{t("select.title")}</h3>
             <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
-              {conversation.turns.length} turns total / {local.length} selected
+              {t("select.summary", { total: conversation.turns.length, selected: local.length })}
             </p>
           </div>
           <button
@@ -75,10 +77,10 @@ export function SelectModal({ conversation, selectedIds, onSelect, onClose }: Pr
                     <div className="min-w-0 flex-1 space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="border border-foreground bg-[var(--paper-soft)] px-2 py-0.5 text-[10px] font-black uppercase">
-                          {turn.role === "user" ? "Prompt" : "Response"}
+                          {turn.role === "user" ? t("select.prompt") : t("select.response")}
                         </span>
                         <span className="text-[10px] font-black uppercase tracking-[0.16em] text-muted-foreground">
-                          turn {index + 1}
+                          {t("select.turn", { n: index + 1 })}
                         </span>
                       </div>
                       <MarkdownRenderer content={displayContent} className="text-sm text-foreground" />
@@ -90,7 +92,7 @@ export function SelectModal({ conversation, selectedIds, onSelect, onClose }: Pr
                             setExpanded((p) => ({ ...p, [turn.id]: !p[turn.id] }))
                           }}
                         >
-                          {isExpanded ? "Collapse" : "Expand"}
+                          {isExpanded ? t("select.collapse") : t("select.expand")}
                         </span>
                       )}
                     </div>
@@ -106,14 +108,14 @@ export function SelectModal({ conversation, selectedIds, onSelect, onClose }: Pr
             onClick={onClose}
             className="border-2 border-foreground bg-background px-4 py-2 text-xs font-black uppercase hover:bg-muted"
           >
-            Cancel
+            {t("select.cancel")}
           </button>
           <button
             onClick={confirm}
             disabled={local.length === 0}
             className="border-2 border-foreground bg-foreground px-4 py-2 text-xs font-black uppercase text-background transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:proof-shadow disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Confirm selection
+            {t("select.confirm")}
           </button>
         </div>
       </div>

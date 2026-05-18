@@ -7,6 +7,7 @@ import Underline from "@tiptap/extension-underline"
 import { Bold, EyeOff, Italic, Trash2, Underline as UnderlineIcon } from "lucide-react"
 import { BlurMark } from "@/lib/tiptap/blur-mark"
 import type { ConversationTurn } from "@/lib/types"
+import { useLocale } from "@/lib/i18n"
 
 interface Props {
   turn: ConversationTurn
@@ -43,6 +44,7 @@ function ToolbarBtn({
 }
 
 export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, onDelete }: Props) {
+  const { t } = useLocale()
   const isUser = turn.role === "user"
   const avatarLabel = isUser ? (avatarUser || "我") : (avatarAI || "AI")
   const [hasSelection, setHasSelection] = useState(false)
@@ -106,19 +108,19 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
             className="absolute z-30 flex items-center gap-1 border-2 border-foreground bg-[var(--paper)] p-1 ink-shadow"
             style={{ top: toolbarPos.top, left: toolbarPos.left }}
           >
-            <ToolbarBtn label="Bold" onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
+            <ToolbarBtn label={t("editor.bold")} onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
               <Bold className="h-3.5 w-3.5" />
             </ToolbarBtn>
-            <ToolbarBtn label="Italic" onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
+            <ToolbarBtn label={t("editor.italic")} onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
               <Italic className="h-3.5 w-3.5" />
             </ToolbarBtn>
-            <ToolbarBtn label="Underline" onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")}>
+            <ToolbarBtn label={t("editor.underline")} onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")}>
               <UnderlineIcon className="h-3.5 w-3.5" />
             </ToolbarBtn>
-            <ToolbarBtn label="Blur sensitive text" onClick={() => editor.chain().focus().toggleMark("blur").run()} active={editor.isActive("blur")}>
+            <ToolbarBtn label={t("editor.blurText")} onClick={() => editor.chain().focus().toggleMark("blur").run()} active={editor.isActive("blur")}>
               <EyeOff className="h-3.5 w-3.5" />
             </ToolbarBtn>
-            <ToolbarBtn label="Delete selection" onClick={() => editor.chain().focus().deleteSelection().run()}>
+            <ToolbarBtn label={t("editor.deleteSelection")} onClick={() => editor.chain().focus().deleteSelection().run()}>
               <Trash2 className="h-3.5 w-3.5" />
             </ToolbarBtn>
           </div>
@@ -136,7 +138,7 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
             : "bg-[var(--paper-soft)] ink-shadow"
         }`}>
           <div className="mb-2 flex items-center gap-2 border-b border-foreground/35 pb-1 text-[10px] font-black uppercase tracking-[0.16em] text-muted-foreground">
-            <span>{isUser ? "Source note" : "AI response"}</span>
+            <span>{isUser ? t("editor.sourceNote") : t("editor.aiResponse")}</span>
           </div>
           <EditorContent editor={editor} />
         </div>
@@ -148,7 +150,7 @@ export function TurnEditor({ turn, initialHtml, avatarUser, avatarAI, onChange, 
           onClick={onDelete}
           className="opacity-0 transition-opacity text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground hover:text-[var(--proof)] group-hover:opacity-100"
         >
-          Remove turn
+          {t("editor.removeTurn")}
         </button>
       </div>
     </div>

@@ -51,6 +51,19 @@
 :root {
   --font-ui: "Aptos", "Segoe UI", "Helvetica Neue", sans-serif;
   --font-editorial: "Georgia", "Times New Roman", serif;
+}
+
+/* Locale-specific font overrides */
+html[data-locale="zh"] {
+  --font-ui: var(--font-zh), "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", serif;
+  --font-editorial: var(--font-zh), "STSong", "SimSun", serif;
+}
+html[data-locale="ja"] {
+  --font-ui: var(--font-ja), "Hiragino Mincho Pro", "Yu Mincho", serif;
+  --font-editorial: var(--font-ja), "Hiragino Mincho Pro", serif;
+}
+
+:root {
   --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
   --paper: oklch(0.955 0.026 91.15);
   --paper-soft: oklch(0.982 0.016 92.33);

@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react"
 import { marked } from "marked"
 import { TurnEditor } from "./TurnEditor"
 import type { ConversationTurn } from "@/lib/types"
+import { useLocale } from "@/lib/i18n"
 
 interface EditableTurn {
   turn: ConversationTurn
@@ -24,6 +25,7 @@ async function mdToHtml(md: string): Promise<string> {
 }
 
 export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI, onChange }: Props) {
+  const { t } = useLocale()
   const [editables, setEditables] = useState<EditableTurn[]>([])
 
   const turnsKey = initialTurns.map((t) => t.id).join(",")
@@ -63,9 +65,9 @@ export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI,
     return (
       <div className="flex min-h-full items-center justify-center p-12">
         <div className="max-w-xs border-2 border-foreground bg-[var(--paper-soft)] p-5 text-center ink-shadow">
-          <p className="font-editorial text-xl font-black">No copy on the desk.</p>
+          <p className="font-editorial text-xl font-black">{t("editor.emptyTitle")}</p>
           <p className="mt-2 text-xs font-semibold text-muted-foreground">
-            Import a conversation and the editable transcript will appear here.
+            {t("editor.emptySubtitle")}
           </p>
         </div>
       </div>
@@ -76,7 +78,7 @@ export function ConversationEditor({ initialTurns, isDemo, avatarUser, avatarAI,
     <div className="flex flex-col gap-4 p-6">
       {isDemo && (
         <div className="mx-auto border border-foreground bg-[var(--accent)] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
-          sample copy / import your own to replace it
+          {t("editor.sampleBanner")}
         </div>
       )}
       <AnimatePresence initial={false}>

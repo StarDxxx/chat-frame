@@ -11,6 +11,7 @@ import type { ClassicVariant } from "@/components/classic/ClassicPreview"
 import { THEMES } from "@/lib/themes"
 import { CARD_SIZES, getCardSize } from "@/lib/card-sizes"
 import type { CardSettings, CardSizeId, ConversationTurn, EmotionThemeId, PlatformId, ThemeCategoryId } from "@/lib/types"
+import { useLocale } from "@/lib/i18n"
 
 type ChatVariant = "wechat" | "whatsapp" | "imessage"
 
@@ -26,11 +27,14 @@ const CLASSIC_VARIANTS: { id: ClassicVariant; label: string }[] = [
   { id: "deepseek", label: "DeepSeek" },
 ]
 
-const THEME_CATEGORIES: { id: ThemeCategoryId; label: string }[] = [
-  { id: "card", label: "Editorial card" },
-  { id: "classic", label: "Native AI" },
-  { id: "chat-app", label: "Chat app" },
-]
+const THEME_CATEGORY_IDS: ThemeCategoryId[] = ["card", "classic", "chat-app"]
+
+const SIZE_I18N_KEY: Record<CardSizeId, string> = {
+  square: "square",
+  xiaohongshu: "xiaohongshu",
+  "xiaohongshu-long": "xiaohongshuLong",
+  douyin: "douyin",
+}
 
 interface Props {
   turns: ConversationTurn[]
@@ -77,6 +81,7 @@ export function PreviewPanel({
   onSettingsChange,
   onExport,
 }: Props) {
+  const { t } = useLocale()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [chatVariant, setChatVariant] = useState<ChatVariant>("imessage")
   const [classicVariant, setClassicVariant] = useState<ClassicVariant>("claude")
@@ -94,6 +99,12 @@ export function PreviewPanel({
   const minHeight = isChatApp
     ? Math.round(innerWidth * 844 / 390)   // iPhone 390×844 logical resolution
     : Math.round(innerWidth * rh / rw)
+
+  const categoryLabel = (id: ThemeCategoryId) => {
+    if (id === "card") return t("preview.card")
+    if (id === "classic") return t("preview.classic")
+    return t("preview.chatApp")
+  }
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -124,17 +135,17 @@ export function PreviewPanel({
 
       <div className="shrink-0 space-y-2 border-t-2 border-foreground bg-[var(--paper-soft)] p-3">
         <div className="flex gap-1.5 overflow-x-auto pb-0.5">
-          {THEME_CATEGORIES.map((cat) => (
+          {THEME_CATEGORY_IDS.map((id) => (
             <button
-              key={cat.id}
-              onClick={() => onThemeCategoryChange(cat.id)}
+              key={id}
+              onClick={() => onThemeCategoryChange(id)}
               className={`shrink-0 border-2 border-foreground px-3 py-1 text-xs font-black uppercase transition-transform ${
-                themeCategory === cat.id
+                themeCategory === id
                   ? "bg-foreground text-background"
                   : "bg-background text-foreground hover:-translate-x-0.5 hover:-translate-y-0.5 hover:ink-shadow"
               }`}
             >
-              {cat.label}
+              {categoryLabel(id)}
             </button>
           ))}
         </div>
@@ -195,12 +206,12 @@ export function PreviewPanel({
               <button
                 key={s.id}
                 onClick={() => onSizeChange(s.id)}
-                title={`预览宽度 ${s.previewWidth}px`}
+                title={`${s.previewWidth}px`}
                 className={`shrink-0 border border-foreground px-3 py-1 text-xs font-bold uppercase ${
                   settings.sizeId === s.id ? "bg-foreground text-background" : "bg-background hover:bg-muted"
                 }`}
               >
-                {s.label}
+                {t(`size.${SIZE_I18N_KEY[s.id]}`)}
               </button>
             ))}
           </div>
@@ -224,7 +235,7 @@ export function PreviewPanel({
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
                       <Type className="h-3.5 w-3.5" />
-                      Type size
+                      {t("preview.typeSize")}
                     </span>
                     <div className="flex items-center gap-1">
                       <button
@@ -244,14 +255,14 @@ export function PreviewPanel({
                   </div>
 
                   <Toggle
-                    label="Show avatars"
+                    label={t("preview.showAvatars")}
                     checked={settings.showAvatars}
                     onChange={(v) => onSettingsChange({ showAvatars: v })}
                   />
                   {settings.showAvatars && (
                     <div className="grid grid-cols-2 gap-2">
                       <label className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                        User
+                        {t("preview.userLabel")}
                         <input
                           className="mt-1 h-7 w-full border border-foreground bg-background px-1.5 text-center text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[var(--proof)]"
                           maxLength={4}
@@ -261,7 +272,7 @@ export function PreviewPanel({
                         />
                       </label>
                       <label className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                        AI
+                        {t("preview.aiLabel")}
                         <input
                           className="mt-1 h-7 w-full border border-foreground bg-background px-1.5 text-center text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[var(--proof)]"
                           maxLength={4}
@@ -273,7 +284,7 @@ export function PreviewPanel({
                     </div>
                   )}
                   <Toggle
-                    label="Show footer"
+                    label={t("preview.showFooter")}
                     checked={settings.showFooter}
                     onChange={(v) => onSettingsChange({ showFooter: v })}
                   />
@@ -287,7 +298,7 @@ export function PreviewPanel({
             className="flex h-9 flex-1 items-center justify-center gap-2 border-2 border-foreground bg-foreground text-xs font-black uppercase text-background transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:proof-shadow"
           >
             <ImageDown className="h-4 w-4" />
-            Export PNG
+            {t("preview.exportPng")}
           </button>
         </div>
       </div>
