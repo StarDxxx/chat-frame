@@ -2,8 +2,6 @@
 
 import { useState } from "react"
 import { Check, X } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { MarkdownRenderer } from "@/components/MarkdownRenderer"
 import type { Conversation } from "@/lib/types"
 import { useLocale } from "@/lib/i18n"
 
@@ -14,10 +12,21 @@ interface Props {
   onClose: () => void
 }
 
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/!\[.*?\]\(.*?\)/g, "")
+    .replace(/\[.*?\]\(.*?\)/g, "")
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/[*_~>]/g, "")
+    .replace(/\n+/g, " ")
+    .trim()
+}
+
 export function SelectModal({ conversation, selectedIds, onSelect, onClose }: Props) {
   const { t } = useLocale()
   const [local, setLocal] = useState<string[]>(selectedIds)
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 
   const toggle = (id: string) =>
     setLocal((prev) =>
@@ -50,19 +59,17 @@ export function SelectModal({ conversation, selectedIds, onSelect, onClose }: Pr
           </button>
         </div>
 
-        <ScrollArea className="min-h-0 flex-1 px-5 py-4">
-          <div className="space-y-3">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          <div className="space-y-2">
             {conversation.turns.map((turn, index) => {
               const selected = local.includes(turn.id)
-              const long = turn.content.length > 220
-              const isExpanded = expanded[turn.id]
-              const displayContent = long && !isExpanded ? turn.content.slice(0, 220) + "..." : turn.content
+              const preview = stripMarkdown(turn.content)
 
               return (
                 <button
                   key={turn.id}
                   onClick={() => toggle(turn.id)}
-                  className={`block w-full border-2 p-3 text-left transition-transform ${
+                  className={`group block w-full border-2 p-3 text-left transition-transform ${
                     selected
                       ? "border-foreground bg-[var(--accent)] proof-shadow"
                       : "border-foreground bg-background hover:-translate-x-0.5 hover:-translate-y-0.5 hover:ink-shadow"
@@ -74,8 +81,8 @@ export function SelectModal({ conversation, selectedIds, onSelect, onClose }: Pr
                     }`}>
                       {selected && <Check className="h-3.5 w-3.5" />}
                     </span>
-                    <div className="min-w-0 flex-1 space-y-2">
-                      <div className="flex flex-wrap items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1.5 flex flex-wrap items-center gap-2">
                         <span className="border border-foreground bg-[var(--paper-soft)] px-2 py-0.5 text-[10px] font-black uppercase">
                           {turn.role === "user" ? t("select.prompt") : t("select.response")}
                         </span>
@@ -83,25 +90,16 @@ export function SelectModal({ conversation, selectedIds, onSelect, onClose }: Pr
                           {t("select.turn", { n: index + 1 })}
                         </span>
                       </div>
-                      <MarkdownRenderer content={displayContent} className="text-sm text-foreground" />
-                      {long && (
-                        <span
-                          className="inline-block text-xs font-black uppercase tracking-[0.12em] text-[var(--proof)]"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setExpanded((p) => ({ ...p, [turn.id]: !p[turn.id] }))
-                          }}
-                        >
-                          {isExpanded ? t("select.collapse") : t("select.expand")}
-                        </span>
-                      )}
+                      <p className="line-clamp-1 text-sm text-foreground group-hover:line-clamp-4">
+                        {preview}
+                      </p>
                     </div>
                   </div>
                 </button>
               )
             })}
           </div>
-        </ScrollArea>
+        </div>
 
         <div className="flex shrink-0 justify-end gap-2 border-t-2 border-foreground bg-[var(--paper)] px-5 py-4">
           <button
