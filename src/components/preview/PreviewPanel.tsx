@@ -83,15 +83,24 @@ export function PreviewPanel({
 
   const size = getCardSize(settings.sizeId)
   const [rw, rh] = size.ratio.split("/").map(Number)
-  // Card wrapper has p-2 (8px each side), so inner card width = previewWidth - 16
-  const minHeight = Math.round((size.previewWidth - 16) * rh / rw)
+
+  // Chat App uses a fixed iPhone 17 screen width regardless of the size selector
+  const IPHONE_WIDTH = 390
+  const isChatApp = themeCategory === "chat-app"
+  const cardWidth = isChatApp ? IPHONE_WIDTH : size.previewWidth
+
+  // Card wrapper has p-2 (8px each side), so inner card width = cardWidth - 16
+  const innerWidth = cardWidth - 16
+  const minHeight = isChatApp
+    ? Math.round(innerWidth * 844 / 390)   // iPhone 390×844 logical resolution
+    : Math.round(innerWidth * rh / rw)
 
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex min-h-0 flex-1 flex-col items-center gap-4 overflow-y-auto bg-[var(--paper)] p-6">
         <div
           className="border-2 border-foreground bg-background p-2 ink-shadow"
-          style={{ width: size.previewWidth }}
+          style={{ width: cardWidth }}
         >
           {themeCategory === "chat-app" ? (
             chatVariant === "wechat"
@@ -179,21 +188,23 @@ export function PreviewPanel({
           </div>
         )}
 
-        {/* Width selector — always visible */}
-        <div className="flex gap-1.5 overflow-x-auto pb-0.5">
-          {CARD_SIZES.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => onSizeChange(s.id)}
-              title={`预览宽度 ${s.previewWidth}px`}
-              className={`shrink-0 border border-foreground px-3 py-1 text-xs font-bold uppercase ${
-                settings.sizeId === s.id ? "bg-foreground text-background" : "bg-background hover:bg-muted"
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
+        {/* Width selector — hidden for Chat App (fixed iPhone width) */}
+        {!isChatApp && (
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+            {CARD_SIZES.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => onSizeChange(s.id)}
+                title={`预览宽度 ${s.previewWidth}px`}
+                className={`shrink-0 border border-foreground px-3 py-1 text-xs font-bold uppercase ${
+                  settings.sizeId === s.id ? "bg-foreground text-background" : "bg-background hover:bg-muted"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="flex items-center gap-2">
           <div className="relative">
