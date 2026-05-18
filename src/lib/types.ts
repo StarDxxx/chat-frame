@@ -40,6 +40,7 @@ export type CardSizeId = "square" | "xiaohongshu" | "xiaohongshu-long" | "douyin
 export interface CardSettings {
   showAvatars: boolean
   showFooter: boolean
+  showDate: boolean
   sizeId: CardSizeId
   layoutFlow: "top-down" | "bottom-up"
   fontSize: number

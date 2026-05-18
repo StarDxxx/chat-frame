@@ -288,6 +288,13 @@ export function PreviewPanel({
                     checked={settings.showFooter}
                     onChange={(v) => onSettingsChange({ showFooter: v })}
                   />
+                  {themeCategory === "card" && (
+                    <Toggle
+                      label={t("preview.showDate")}
+                      checked={settings.showDate}
+                      onChange={(v) => onSettingsChange({ showDate: v })}
+                    />
+                  )}
                 </div>
               </>
             )}

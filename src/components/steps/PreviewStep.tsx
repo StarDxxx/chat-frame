@@ -58,7 +58,7 @@ export function PreviewStep({ turns, themeId, platform, onThemeChange, onBack, o
         {/* Card preview */}
         <div className="flex-1 flex items-start justify-center">
           <div className="w-full max-w-sm">
-            <CardPreview turns={turns} themeId={themeId} platform={platform} settings={{ showAvatars: true, showFooter: true, sizeId: "xiaohongshu", layoutFlow: "bottom-up", fontSize: 12, avatarUser: "我", avatarAI: "" }} />
+            <CardPreview turns={turns} themeId={themeId} platform={platform} settings={{ showAvatars: true, showFooter: true, showDate: false, sizeId: "xiaohongshu", layoutFlow: "bottom-up", fontSize: 12, avatarUser: "我", avatarAI: "" }} />
           </div>
         </div>
 

@@ -40,6 +40,7 @@ const INITIAL: PageState = {
   settings: {
     showAvatars: true,
     showFooter: true,
+    showDate: false,
     sizeId: "xiaohongshu",
     layoutFlow: "bottom-up",
     fontSize: 12,

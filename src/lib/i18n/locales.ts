@@ -58,6 +58,7 @@ export type Translations = {
     userLabel: string
     aiLabel: string
     showFooter: string
+    showDate: string
   }
   size: {
     square: string
@@ -141,6 +142,7 @@ const en: Translations = {
     userLabel: "User",
     aiLabel: "AI",
     showFooter: "Show footer",
+    showDate: "Show date",
   },
   size: {
     square: "Square",
@@ -224,6 +226,7 @@ const zh: Translations = {
     userLabel: "用户",
     aiLabel: "AI",
     showFooter: "显示页脚",
+    showDate: "显示日期",
   },
   size: {
     square: "方格",
@@ -307,6 +310,7 @@ const ja: Translations = {
     userLabel: "ユーザー",
     aiLabel: "AI",
     showFooter: "フッター表示",
+    showDate: "日付表示",
   },
   size: {
     square: "スクエア",
