@@ -177,7 +177,7 @@ export function PreviewPanel({
                 }`}
               >
                 <span className={`h-4 w-4 border border-foreground bg-gradient-to-br ${theme.gradient}`} />
-                {theme.label}
+                {t(`themes.${theme.id}`)}
               </button>
             ))}
           </div>

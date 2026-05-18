@@ -76,6 +76,11 @@ export type Translations = {
     cancel: string
     confirm: string
   }
+  themes: {
+    graphite: string
+    sky: string
+    ocean: string
+  }
 }
 
 const en: Translations = {
@@ -153,6 +158,11 @@ const en: Translations = {
     expand: "Expand",
     cancel: "Cancel",
     confirm: "Confirm selection",
+  },
+  themes: {
+    graphite: "Graphite",
+    sky: "Sky",
+    ocean: "Ocean",
   },
 }
 
@@ -232,6 +242,11 @@ const zh: Translations = {
     cancel: "取消",
     confirm: "确认选择",
   },
+  themes: {
+    graphite: "石墨",
+    sky: "天蓝",
+    ocean: "碧蓝",
+  },
 }
 
 const ja: Translations = {
@@ -309,6 +324,11 @@ const ja: Translations = {
     expand: "展開",
     cancel: "キャンセル",
     confirm: "選択を確定",
+  },
+  themes: {
+    graphite: "黒鉛",
+    sky: "空色",
+    ocean: "海色",
   },
 }
 
