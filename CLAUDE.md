@@ -24,7 +24,7 @@ Single-page app (`src/app/page.tsx`) with all state in one `PageState` object ma
 ### Two-panel layout
 
 ```
-Header (brand only)
+Header (brand, locale switcher, export button)
 ├── Left panel  [flex-6]  ImportBar (sticky) + ConversationEditor (scrollable)
 └── Right panel [flex-4]  PreviewPanel (card preview + all controls)
 ```
@@ -50,9 +50,30 @@ Two entry points in `ImportBar`:
 
 After URL import the `SelectModal` opens automatically; after .txt import all turns are selected directly (user already curated the file).
 
-Platform parsers live in `src/lib/platforms/`. Each implements `PlatformParser` (`canHandle` + `parse`). Only DeepSeek is implemented; ChatGPT/Claude parsers are registered stubs. To add a parser, implement the interface and push it onto the `parsers` array in `src/lib/platforms/index.ts`.
+Platform parsers live in `src/lib/platforms/`. Each implements `PlatformParser` (`canHandle` + `parse`). All three platforms are implemented:
+- **DeepSeek** — direct `fetch` to the DeepSeek share API (`chat.deepseek.com/api/v0/share/content`)
+- **Claude** — uses Puppeteer (server-side) to bypass Cloudflare, then calls `/api/chat_snapshots/{id}`
+- **ChatGPT** — uses Puppeteer (server-side) to scrape `[data-message-author-role]` elements
+
+To add a parser, implement `PlatformParser` and push it onto the `parsers` array in `src/lib/platforms/index.ts`.
 
 `parseText()` recognises prefixes `AI:`, `Human:`, `人类:`, `User:`, `你:`, etc. and accumulates multi-line turns until the next role prefix.
+
+### i18n system
+
+Three supported locales: `"zh"` (default), `"ja"`, `"en"`. Managed by `src/lib/i18n/`:
+
+- `LocaleProvider` wraps the app root and exposes `useLocale()` → `{ locale, setLocale, t }`
+- `t("key.path")` resolves dot-separated paths against the active locale's `Translations` object in `src/lib/i18n/locales.ts`. Supports `{var}` interpolation.
+- Locale is persisted in `localStorage` and applied to `document.documentElement.lang`.
+- All UI-visible strings must go through `t()`. When adding a new string, add the key to the `Translations` type and all three locale objects in `locales.ts`.
+- When `isDemo` is true, a locale change also reloads the demo conversation, resets `fontId` to `DEFAULT_FONT_ID[locale]`, and resets `avatarUser` to the locale-aware default.
+
+### Font system
+
+Per-locale typeface options are defined in `src/lib/fonts.ts`. Each locale has exactly three fonts (`FONT_OPTIONS[locale]`). `DEFAULT_FONT_ID` provides the locale-aware default. Fonts are loaded via `next/font` and exposed as CSS custom properties (`--font-zh`, `--font-ja`, etc.).
+
+`CardSettings.fontId` is typed as `string` (not the `FontId` union) so the card can be serialised without importing font types. To add a font: add an entry to `FONT_OPTIONS[locale]` in `fonts.ts`; the CSS variable must be registered in `layout.tsx`.
 
 ### Theme system (two-level)
 
@@ -64,8 +85,12 @@ ThemeCategoryId   →  "chat-app" | "card" | "memo" | "classic"
 - `ThemeCategoryId` selects the rendering template. Only `"card"` is implemented; the others show a placeholder.
 - `CardColorId` (aliased as `EmotionThemeId`) selects the gradient/colour scheme within the card template. Defined in `src/lib/themes.ts`.
 - `CardPreview` uses `bg-gradient-to-br` + `theme.gradient` for the card background. Always top-left → bottom-right.
-- To add a card colour: add an `EmotionThemeId` value in `types.ts` and a matching entry in `themes.ts`.
+- To add a card colour: add a `CardColorId` value in `types.ts` and a matching `EmotionTheme` entry in `themes.ts`.
 - To implement a new category template: add a renderer branch in `PreviewPanel` and a matching export path in `page.tsx`.
+
+### Card sizes
+
+Defined in `src/lib/card-sizes.ts` as `CARD_SIZES: CardSizePreset[]`. Each preset has `previewWidth` (on-screen px) and `exportWidth`/`exportHeight` (output resolution). Current sizes: `square` (1080×1080), `xiaohongshu` (900×1200), `xiaohongshu-long` (900×1500), `douyin` (1080×1920). To add a size: add the `CardSizeId` value to `types.ts` and a `CardSizePreset` to `card-sizes.ts`.
 
 ### Card export & pagination
 
@@ -79,6 +104,10 @@ ThemeCategoryId   →  "chat-app" | "card" | "memo" | "classic"
 
 The floating format toolbar appears on text selection via `onSelectionUpdate`. It is hidden via `onBlur` (editor loses focus when clicking another bubble or outside), preventing stale toolbars from accumulating.
 
+### Placeholder / demo content
+
+`src/lib/placeholder.ts` stores per-locale demo conversations (`PLACEHOLDERS: Record<Locale, LocalePlaceholder>`). When adding a locale, add a placeholder entry here.
+
 ### Unused / legacy components
 
 `src/components/dashboard/LeftPanel.tsx`, `RightPanel.tsx`, and `src/components/steps/` are not used by the main dashboard page. They are kept for potential future use but do not affect the running app.
@@ -90,7 +119,9 @@ The floating format toolbar appears on text selection via `onSelectionUpdate`. I
 | Type | Purpose |
 |------|---------|
 | `ConversationTurn` | `{ id, role, content, thinking? }` — one message |
-| `Conversation` | `{ source, platform?, turns[] }` |
-| `CardSettings` | All per-card options including `avatarUser`, `avatarAI`, `sizeId`, `layoutFlow`, `fontSize` |
+| `Conversation` | `{ source, platform?, rawUrl?, title?, turns[] }` |
+| `CardSettings` | All per-card options: `avatarUser`, `avatarAI`, `sizeId`, `layoutFlow`, `fontSize`, `fontId` (string), `showAvatars`, `showFooter`, `showDate` |
 | `ThemeCategoryId` | Top-level template selector |
 | `EmotionThemeId` | Card colour variant (alias for `CardColorId`) |
+| `CardSizeId` | Export size preset identifier |
+| `PageState` | Full app state in `page.tsx`; includes `isDemo` flag |
