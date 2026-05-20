@@ -48,4 +48,6 @@ Next.js 16 · React 19 · Tiptap · Tailwind CSS 4 · Framer Motion · Puppeteer
 
 <div align="center">
 <sub>MIT License</sub>
+
+<sub>社区支持 · <a href="https://linux.do">linux.do</a></sub>
 </div>
