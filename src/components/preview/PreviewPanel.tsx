@@ -15,11 +15,18 @@ import type { CardSettings, CardSizeId, ConversationTurn, EmotionThemeId, Platfo
 import { useLocale } from "@/lib/i18n"
 
 type ChatVariant = "wechat" | "whatsapp" | "imessage"
+type WechatAiVariant = "claude" | "chatgpt" | "deepseek"
 
 const CHAT_VARIANTS: { id: ChatVariant; label: string }[] = [
   { id: "wechat", label: "WeChat" },
   { id: "whatsapp", label: "WhatsApp" },
   { id: "imessage", label: "iMessage" },
+]
+
+const WECHAT_AI_VARIANTS: { id: WechatAiVariant; label: string }[] = [
+  { id: "claude", label: "Claude" },
+  { id: "chatgpt", label: "ChatGPT" },
+  { id: "deepseek", label: "DeepSeek" },
 ]
 
 const CLASSIC_VARIANTS: { id: ClassicVariant; label: string }[] = [
@@ -86,6 +93,7 @@ export function PreviewPanel({
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [chatVariant, setChatVariant] = useState<ChatVariant>("imessage")
   const [classicVariant, setClassicVariant] = useState<ClassicVariant>("claude")
+  const [wechatAiVariant, setWechatAiVariant] = useState<WechatAiVariant>("claude")
 
   const size = getCardSize(settings.sizeId)
   const [rw, rh] = size.ratio.split("/").map(Number)
@@ -116,7 +124,7 @@ export function PreviewPanel({
         >
           {themeCategory === "chat-app" ? (
             chatVariant === "wechat"
-              ? <WeChatPreview turns={turns} platform={platform} settings={settings} minHeight={minHeight} />
+              ? <WeChatPreview turns={turns} platform={wechatAiVariant} settings={settings} minHeight={minHeight} />
               : chatVariant === "whatsapp"
                 ? <WhatsAppPreview turns={turns} platform={platform} settings={settings} minHeight={minHeight} />
                 : <MemoPreview turns={turns} platform={platform} settings={settings} minHeight={minHeight} />
@@ -159,6 +167,22 @@ export function PreviewPanel({
                 onClick={() => setChatVariant(v.id)}
                 className={`shrink-0 border border-foreground px-2.5 py-0.5 text-[11px] font-bold uppercase ${
                   chatVariant === v.id ? "bg-[var(--accent)]" : "bg-background hover:bg-muted"
+                }`}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {themeCategory === "chat-app" && chatVariant === "wechat" && (
+          <div className="flex gap-1.5 overflow-x-auto">
+            {WECHAT_AI_VARIANTS.map((v) => (
+              <button
+                key={v.id}
+                onClick={() => setWechatAiVariant(v.id)}
+                className={`shrink-0 border border-foreground px-2.5 py-0.5 text-[11px] font-bold uppercase ${
+                  wechatAiVariant === v.id ? "bg-foreground text-background" : "bg-background hover:bg-muted"
                 }`}
               >
                 {v.label}

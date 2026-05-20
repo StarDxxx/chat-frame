@@ -2,6 +2,8 @@
 
 import { ChevronLeft, Mic, MoreHorizontal, Plus, Smile, Volume2 } from "lucide-react"
 import type { CardSettings, ConversationTurn, PlatformId } from "@/lib/types"
+import { useLocale } from "@/lib/i18n"
+import { getFontFamily } from "@/lib/fonts"
 
 function isHtml(content: string) {
   return content.trimStart().startsWith("<")
@@ -78,7 +80,36 @@ function NavBar({ aiLabel }: { aiLabel: string }) {
   )
 }
 
-function Avatar({ label, isUser, size }: { label: string; isUser: boolean; size: number }) {
+const AI_AVATAR: Record<string, { bg: string; icon: string; label: string }> = {
+  claude:   { bg: "#d97757", icon: "/icons/claude.svg",   label: "Claude"   },
+  chatgpt:  { bg: "#000000", icon: "/icons/chatgpt.svg",  label: "ChatGPT"  },
+  deepseek: { bg: "#3468ff", icon: "/icons/deepseek.svg", label: "DeepSeek" },
+}
+
+interface AvatarProps {
+  size: number
+  label: string
+  isUser: boolean
+  photoSrc?: string
+  iconSrc?: string
+  iconBg?: string
+}
+
+function Avatar({ size, label, isUser, photoSrc, iconSrc, iconBg }: AvatarProps) {
+  if (photoSrc) {
+    return (
+      <div className="shrink-0" style={{ width: size, height: size, borderRadius: 6, overflow: "hidden", boxShadow: "0 0.5px 1px rgba(0,0,0,0.08)" }}>
+        <img src={photoSrc} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      </div>
+    )
+  }
+  if (iconSrc && iconBg) {
+    return (
+      <div className="shrink-0" style={{ width: size, height: size, borderRadius: 6, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0.5px 1px rgba(0,0,0,0.08)" }}>
+        <img src={iconSrc} alt={label} style={{ width: "62%", height: "62%", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+      </div>
+    )
+  }
   return (
     <div
       className="shrink-0"
@@ -103,7 +134,7 @@ function Avatar({ label, isUser, size }: { label: string; isUser: boolean; size:
   )
 }
 
-function Bubble({ isUser, children, fontSize }: { isUser: boolean; children: React.ReactNode; fontSize: number }) {
+function Bubble({ isUser, children, fontSize, fontFamily }: { isUser: boolean; children: React.ReactNode; fontSize: number; fontFamily: string }) {
   return (
     <div style={{ position: "relative", display: "inline-block", maxWidth: "72%" }}>
       <div
@@ -124,6 +155,7 @@ function Bubble({ isUser, children, fontSize }: { isUser: boolean; children: Rea
           background: isUser ? BUBBLE_SENT : "#FFF",
           boxShadow: "0 0.5px 1px rgba(0,0,0,0.06)",
           fontSize,
+          fontFamily,
           color: "#171717",
           lineHeight: BUBBLE_LINE_HEIGHT,
           wordBreak: "break-word",
@@ -169,9 +201,7 @@ function InputBar() {
       >
         <Mic size={20} strokeWidth={2.5} color="#777" />
       </div>
-      <div style={circleStyle}>
-        <Smile size={22} strokeWidth={2} color={ICON} />
-      </div>
+      <Smile size={32} strokeWidth={0.9} color={ICON} style={{ flexShrink: 0 }} />
       <div style={circleStyle}>
         <Plus size={23} strokeWidth={2} color={ICON} />
       </div>
@@ -186,10 +216,13 @@ interface Props {
   minHeight?: number
 }
 
-export function WeChatPreview({ turns, settings, minHeight }: Props) {
+export function WeChatPreview({ turns, platform, settings, minHeight }: Props) {
+  const { locale } = useLocale()
   const fs = settings.fontSize || 14
+  const fontFamily = getFontFamily(locale, settings.fontId)
   const avatarSize = getAvatarSize(fs)
-  const aiLabel = settings.avatarAI || "AI"
+  const aiConfig = platform ? AI_AVATAR[platform] : null
+  const aiLabel = aiConfig?.label || settings.avatarAI || "AI"
   const userLabel = settings.avatarUser || "我"
   const showAvatars = settings.showAvatars
 
@@ -232,8 +265,12 @@ export function WeChatPreview({ turns, settings, minHeight }: Props) {
                   flexDirection: isUser ? "row-reverse" : "row",
                 }}
               >
-                {showAvatars && <Avatar label={isUser ? userLabel : aiLabel} isUser={isUser} size={avatarSize} />}
-                <Bubble isUser={isUser} fontSize={fs}>
+                {showAvatars && (
+                  isUser
+                    ? <Avatar size={avatarSize} label={userLabel} isUser={true} photoSrc="/avatars/demo-avatar.png" />
+                    : <Avatar size={avatarSize} label={aiLabel} isUser={false} iconSrc={aiConfig?.icon} iconBg={aiConfig?.bg} />
+                )}
+                <Bubble isUser={isUser} fontSize={fs} fontFamily={fontFamily}>
                   {isHtml(turn.content) ? (
                     <div className="prose-card" dangerouslySetInnerHTML={{ __html: turn.content }} />
                   ) : (
