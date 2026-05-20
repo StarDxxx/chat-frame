@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
+    "@sparticuz/chromium": "^148.0.0",
     "@tiptap/core": "3.23.4",
     "@tiptap/extension-bubble-menu": "^3.23.1",
     "@tiptap/extension-underline": "^3.23.1",
@@ -24,6 +25,7 @@
     "marked": "^18.0.3",
     "motion": "^12.38.0",
     "next": "16.2.6",
+    "puppeteer-core": "^25.0.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",
